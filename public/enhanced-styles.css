@@ -1,0 +1,536 @@
+/* Enhanced Styles for VaultDesk */
+
+/* Root variables for theme colors */
+:root {
+  --primary: #6366f1;
+  --primary-dark: #4f46e5;
+  --secondary: #8b5cf6;
+  --accent: #ec4899;
+  --dark-bg: #0f172a;
+  --dark-card: #1e293b;
+  --light-bg: #f1f5f9;
+  --light-card: #ffffff;
+  --text-dark: #334155;
+  --text-light: #e2e8f0;
+  --success: #10b981;
+  --warning: #f59e0b;
+  --danger: #ef4444;
+  --glass-light: rgba(255, 255, 255, 0.25);
+  --glass-dark: rgba(30, 41, 59, 0.7);
+  --border-light: rgba(255, 255, 255, 0.4);
+  --border-dark: rgba(71, 85, 105, 0.6);
+  --shadow-light: 0 10px 25px -5px rgba(0, 0, 0, 0.1), 0 10px 10px -5px rgba(0, 0, 0, 0.04);
+  --shadow-dark: 0 20px 25px -5px rgba(0, 0, 0, 0.3), 0 10px 10px -5px rgba(0, 0, 0, 0.1);
+}
+
+/* Base styles */
+body {
+  font-family: 'Inter', sans-serif;
+  background: linear-gradient(135deg, var(--light-bg), #e2e8f0);
+  min-height: 100vh;
+  overflow-x: hidden;
+  color: var(--text-dark);
+  transition: background 0.5s ease, color 0.5s ease;
+  background-attachment: fixed;
+}
+
+/* Dark mode styles */
+body.dark {
+  background: linear-gradient(135deg, var(--dark-bg), #1e293b);
+  color: var(--text-light);
+}
+
+/* Enhanced glassmorphism effect */
+.glassmorphism {
+  background: var(--glass-light);
+  backdrop-filter: blur(20px) saturate(180%);
+  -webkit-backdrop-filter: blur(20px) saturate(180%);
+  border: 1px solid var(--border-light);
+  box-shadow: var(--shadow-light);
+  border-radius: 16px;
+  transition: all 0.4s ease;
+}
+
+.dark .glassmorphism {
+  background: var(--glass-dark);
+  border: 1px solid var(--border-dark);
+  box-shadow: var(--shadow-dark);
+}
+
+/* Enhanced neon effect with pulsing animation */
+.neon-effect {
+  box-shadow: 0 0 10px rgba(99, 102, 241, 0.5), 0 0 20px rgba(139, 92, 246, 0.3);
+  transition: all 0.3s ease;
+  position: relative;
+  overflow: hidden;
+}
+
+.neon-effect::before {
+  content: '';
+  position: absolute;
+  top: -2px;
+  left: -2px;
+  right: -2px;
+  bottom: -2px;
+  background: linear-gradient(45deg, var(--primary), var(--secondary), var(--accent));
+  z-index: -1;
+  border-radius: 16px;
+  opacity: 0;
+  transition: opacity 0.3s ease;
+}
+
+.neon-effect:hover {
+  box-shadow: 0 0 15px rgba(99, 102, 241, 0.8), 0 0 30px rgba(139, 92, 246, 0.6);
+  transform: translateY(-2px);
+}
+
+.neon-effect:hover::before {
+  opacity: 0.15;
+}
+
+/* Enhanced floating animation with multiple elements */
+.floating {
+  animation: floating 3s ease-in-out infinite;
+  transition: all 0.3s ease;
+}
+
+.floating:nth-child(2) {
+  animation-delay: 0.5s;
+}
+
+.floating:nth-child(3) {
+  animation-delay: 1s;
+}
+
+@keyframes floating {
+  0% { transform: translateY(0px) rotate(0deg); }
+  50% { transform: translateY(-15px) rotate(2deg); }
+  100% { transform: translateY(0px) rotate(0deg); }
+}
+
+/* Enhanced page transition with staggered animations */
+.page-transition {
+  animation: fadeIn 0.8s cubic-bezier(0.22, 0.61, 0.36, 1);
+}
+
+@keyframes fadeIn {
+  from { opacity: 0; transform: translateY(30px); }
+  to { opacity: 1; transform: translateY(0); }
+}
+
+/* Enhanced biometric button with 3D effect and pulse */
+.biometric-btn {
+  perspective: 1000px;
+  transform-style: preserve-3d;
+  transition: all 0.4s cubic-bezier(0.175, 0.885, 0.32, 1.275);
+  position: relative;
+  overflow: hidden;
+}
+
+.biometric-btn::after {
+  content: '';
+  position: absolute;
+  top: -50%;
+  left: -60%;
+  width: 20px;
+  height: 200%;
+  background: rgba(255, 255, 255, 0.3);
+  transform: rotate(25deg);
+  transition: all 0.7s;
+}
+
+.biometric-btn:hover {
+  transform: rotateY(8deg) scale(1.03);
+  box-shadow: 0 15px 30px rgba(99, 102, 241, 0.5);
+}
+
+.biometric-btn:hover::after {
+  left: 120%;
+}
+
+.biometric-btn:active {
+  transform: rotateY(5deg) scale(0.98);
+}
+
+/* Enhanced avatar with glow and border animation */
+.avatar-circle {
+  clip-path: circle(50% at 50% 50%);
+  border: 3px solid var(--primary);
+  box-shadow: 0 0 20px rgba(99, 102, 241, 0.7);
+  transition: all 0.4s cubic-bezier(0.175, 0.885, 0.32, 1.275);
+  position: relative;
+  overflow: hidden;
+}
+
+.avatar-circle::before {
+  content: '';
+  position: absolute;
+  top: 0;
+  left: 0;
+  width: 100%;
+  height: 100%;
+  background: linear-gradient(45deg, rgba(99, 102, 241, 0.2), rgba(139, 92, 246, 0.2));
+  opacity: 0;
+  transition: opacity 0.3s ease;
+}
+
+.avatar-circle:hover {
+  border-color: var(--secondary);
+  box-shadow: 0 0 30px rgba(139, 92, 246, 0.9);
+  transform: scale(1.05);
+}
+
+.avatar-circle:hover::before {
+  opacity: 1;
+}
+
+/* Enhanced vault item with card flip effect */
+.vault-item {
+  transition: all 0.4s cubic-bezier(0.175, 0.885, 0.32, 1.275);
+  border-radius: 16px;
+  overflow: hidden;
+  position: relative;
+  transform-style: preserve-3d;
+  cursor: pointer;
+}
+
+.vault-item:hover {
+  transform: translateY(-8px) scale(1.02);
+  box-shadow: 0 20px 40px rgba(0, 0, 0, 0.15);
+}
+
+.dark .vault-item:hover {
+  box-shadow: 0 20px 40px rgba(0, 0, 0, 0.4);
+}
+
+/* Input and textarea focus with enhanced effects */
+input, textarea, select {
+  transition: all 0.3s ease;
+}
+
+input:focus, textarea:focus, select:focus {
+  border-color: var(--primary);
+  box-shadow: 0 0 0 4px rgba(99, 102, 241, 0.3);
+  outline: none;
+  transform: translateY(-2px);
+}
+
+.dark input:focus, .dark textarea:focus, .dark select:focus {
+  border-color: var(--secondary);
+  box-shadow: 0 0 0 4px rgba(139, 92, 246, 0.4);
+}
+
+/* Enhanced theme toggle button with rotation effect */
+#theme-toggle {
+  transition: all 0.5s cubic-bezier(0.68, -0.55, 0.265, 1.55);
+  border: 1px solid rgba(0,0,0,0.1);
+  border-radius: 50%;
+  padding: 8px;
+}
+
+.dark #theme-toggle {
+  border: 1px solid rgba(255,255,255,0.1);
+}
+
+#theme-toggle:hover {
+  transform: rotate(30deg) scale(1.1);
+  box-shadow: 0 0 15px rgba(99, 102, 241, 0.5);
+}
+
+#theme-toggle:active {
+  transform: rotate(30deg) scale(0.95);
+}
+
+/* Enhanced modal animations with backdrop blur */
+.modal-overlay {
+  backdrop-filter: blur(10px);
+  background: rgba(0, 0, 0, 0.5);
+  animation: modalOverlay 0.4s ease-out;
+}
+
+@keyframes modalOverlay {
+  from { opacity: 0; backdrop-filter: blur(0px); }
+  to { opacity: 1; backdrop-filter: blur(10px); }
+}
+
+.modal-content {
+  animation: modalContent 0.4s cubic-bezier(0.175, 0.885, 0.32, 1.275);
+  transform-origin: center;
+}
+
+@keyframes modalContent {
+  from { opacity: 0; transform: scale(0.8) translateY(50px); }
+  to { opacity: 1; transform: scale(1) translateY(0); }
+}
+
+/* Enhanced notification with slide-in effect */
+.notification {
+  animation: slideIn 0.5s cubic-bezier(0.22, 0.61, 0.36, 1) forwards;
+  transform-origin: bottom center;
+}
+
+@keyframes slideIn {
+  from { 
+    opacity: 0; 
+    transform: translateY(100px) scale(0.8); 
+  }
+  to { 
+    opacity: 1; 
+    transform: translateY(0) scale(1); 
+  }
+}
+
+/* Enhanced button effects */
+button {
+  cursor: pointer;
+  transition: all 0.3s cubic-bezier(0.34, 1.56, 0.64, 1);
+  position: relative;
+  overflow: hidden;
+}
+
+button::after {
+  content: '';
+  position: absolute;
+  top: 50%;
+  left: 50%;
+  width: 0;
+  height: 0;
+  background: rgba(255, 255, 255, 0.2);
+  border-radius: 50%;
+  transform: translate(-50%, -50%);
+  transition: width 0.6s, height 0.6s;
+}
+
+button:hover {
+  transform: translateY(-3px);
+  box-shadow: 0 10px 20px rgba(0, 0, 0, 0.1);
+}
+
+button:hover::after {
+  width: 300px;
+  height: 300px;
+}
+
+button:active {
+  transform: translateY(1px) scale(0.98);
+}
+
+button:active::after {
+  width: 0;
+  height: 0;
+}
+
+/* Enhanced copy and download buttons */
+.copy-btn, .download-btn {
+  background: none;
+  border: none;
+  padding: 8px;
+  border-radius: 8px;
+  transition: all 0.2s ease;
+  position: relative;
+  overflow: hidden;
+}
+
+.copy-btn:hover, .download-btn:hover {
+  background-color: rgba(99, 102, 241, 0.1);
+  transform: scale(1.1);
+}
+
+.dark .copy-btn:hover, .dark .download-btn:hover {
+  background-color: rgba(139, 92, 246, 0.2);
+}
+
+/* Enhanced status badges with pulse effect */
+.status-badge {
+  font-weight: 600;
+  letter-spacing: 0.5px;
+  position: relative;
+  overflow: hidden;
+  border-radius: 9999px;
+  padding: 0.25rem 0.75rem;
+}
+
+.status-badge.open::after {
+  content: '';
+  position: absolute;
+  top: 0;
+  left: 0;
+  width: 100%;
+  height: 100%;
+  background: rgba(255, 255, 255, 0.2);
+  animation: pulse 2s infinite;
+}
+
+@keyframes pulse {
+  0% { transform: scale(0.95); opacity: 0.7; }
+  50% { transform: scale(1.05); opacity: 0.3; }
+  100% { transform: scale(0.95); opacity: 0.7; }
+}
+
+/* Enhanced scrollbar */
+::-webkit-scrollbar {
+  width: 10px;
+}
+
+::-webkit-scrollbar-track {
+  background: var(--light-bg);
+  border-radius: 10px;
+}
+
+.dark::-webkit-scrollbar-track {
+  background: var(--dark-bg);
+}
+
+::-webkit-scrollbar-thumb {
+  background: linear-gradient(var(--primary), var(--secondary));
+  border-radius: 10px;
+  transition: background 0.3s ease;
+}
+
+::-webkit-scrollbar-thumb:hover {
+  background: linear-gradient(var(--secondary), var(--accent));
+}
+
+/* Enhanced responsive adjustments */
+@media (max-width: 768px) {
+  .vault-item {
+    transform: none !important;
+    box-shadow: 0 5px 15px rgba(0, 0, 0, 0.08);
+  }
+
+  .vault-item:hover {
+    box-shadow: 0 8px 20px rgba(0, 0, 0, 0.1);
+  }
+
+  .dark .vault-item {
+    box-shadow: 0 5px 15px rgba(0, 0, 0, 0.2);
+  }
+}
+
+/* Chatbot styles */
+.chatbot-category-btn {
+  transition: all 0.3s ease;
+  cursor: pointer;
+  font-weight: 600;
+  box-shadow: 0 2px 4px rgba(0, 0, 0, 0.1);
+  border: 2px solid transparent;
+}
+
+.chatbot-category-btn:hover {
+  transform: translateY(-2px);
+  box-shadow: 0 4px 8px rgba(0, 0, 0, 0.15);
+  border-color: var(--primary);
+}
+
+.dark .chatbot-category-btn:hover {
+  box-shadow: 0 4px 8px rgba(0, 0, 0, 0.3);
+  border-color: var(--primary);
+}
+
+.chatbot-category-btn:active {
+  transform: translateY(0);
+}
+
+.chatbot-category-btn.ring-2 {
+  box-shadow: 0 0 0 3px var(--primary);
+  font-weight: 700;
+  border: 2px solid var(--primary);
+  transform: translateY(-2px);
+}
+
+.chatbot-question-btn {
+  transition: all 0.2s ease;
+  cursor: pointer;
+  text-align: left;
+  width: 100%;
+  border: none;
+  font-weight: 500;
+  margin-bottom: 8px;
+  padding: 12px 16px;
+  border-radius: 8px;
+  background-color: #ffffff;
+  color: #334155;
+  box-shadow: 0 1px 3px rgba(0, 0, 0, 0.1);
+  border: 1px solid rgba(0, 0, 0, 0.1);
+}
+
+.dark .chatbot-question-btn {
+  background-color: #1e293b;
+  color: #e2e8f0;
+  box-shadow: 0 1px 3px rgba(0, 0, 0, 0.3);
+  border: 1px solid rgba(255, 255, 255, 0.1);
+}
+
+.chatbot-question-btn:hover {
+  background-color: #f1f5f9 !important;
+  transform: translateY(-1px);
+  box-shadow: 0 2px 6px rgba(0, 0, 0, 0.15);
+  border-color: var(--primary);
+}
+
+.dark .chatbot-question-btn:hover {
+  background-color: #334155 !important;
+  box-shadow: 0 2px 6px rgba(0, 0, 0, 0.4);
+  border-color: var(--primary);
+}
+
+.chatbot-question-btn:active {
+  transform: translateY(0);
+}
+
+#chatbot-window {
+  background-color: #f8fafc;
+  border-radius: 8px;
+  padding: 16px;
+  margin-bottom: 16px;
+  border: 1px solid rgba(0, 0, 0, 0.1);
+}
+
+.dark #chatbot-window {
+  background-color: #1e293b;
+  border: 1px solid rgba(255, 255, 255, 0.1);
+}
+
+.chatbot-message {
+  padding: 10px 14px;
+  border-radius: 18px;
+  margin-bottom: 12px;
+  max-width: 80%;
+}
+
+.chatbot-message.user {
+  background-color: #e0e7ff;
+  color: #4f46e5;
+  margin-left: auto;
+}
+
+.dark .chatbot-message.user {
+  background-color: #4f46e5;
+  color: #e0e7ff;
+}
+
+.chatbot-message.bot {
+  background-color: #f1f5f9;
+  color: #334155;
+}
+
+.dark .chatbot-message.bot {
+  background-color: #334155;
+  color: #e2e8f0;
+}
+
+.self-start {
+  background-color: #f1f5f9;
+}
+
+.dark .self-start {
+  background-color: #334155;
+}
+
+.self-end {
+  background-color: #e0e7ff;
+}
+
+.dark .self-end {
+  background-color: #4f46e5;
+}

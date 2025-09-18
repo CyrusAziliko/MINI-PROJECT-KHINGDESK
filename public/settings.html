@@ -1,0 +1,326 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1" />
+    <title>Account Settings - VaultDesk</title>
+    <link rel="stylesheet" href="enhanced-styles.css" />
+    <link rel="stylesheet" href="animations-enhanced.css" />
+    <style>
+        .settings-container {
+            max-width: 600px;
+            margin: 2rem auto;
+            padding: 2rem;
+            background: white;
+            border-radius: 10px;
+            box-shadow: 0 4px 6px rgba(0, 0, 0, 0.1);
+        }
+        .form-group {
+            margin-bottom: 1.5rem;
+        }
+        .form-group label {
+            display: block;
+            margin-bottom: 0.5rem;
+            font-weight: 600;
+            color: #333;
+        }
+        .form-group input[type="text"],
+        .form-group input[type="email"],
+        .form-group input[type="password"] {
+            width: 100%;
+            padding: 0.75rem;
+            border: 1px solid #ddd;
+            border-radius: 5px;
+            font-size: 1rem;
+        }
+        .form-group input:focus {
+            outline: none;
+            border-color: #007bff;
+            box-shadow: 0 0 0 2px rgba(0, 123, 255, 0.25);
+        }
+        .btn-group {
+            display: flex;
+            gap: 1rem;
+            margin-top: 2rem;
+        }
+        .btn {
+            padding: 0.75rem 1.5rem;
+            border: none;
+            border-radius: 5px;
+            cursor: pointer;
+            font-size: 1rem;
+            transition: all 0.3s ease;
+        }
+        .btn-primary {
+            background: #007bff;
+            color: white;
+        }
+        .btn-primary:hover {
+            background: #0056b3;
+        }
+        .btn-secondary {
+            background: #6c757d;
+            color: white;
+        }
+        .btn-secondary:hover {
+            background: #545b62;
+        }
+        .error-message {
+            color: #dc3545;
+            font-size: 0.875rem;
+            margin-top: 0.25rem;
+        }
+        .success-message {
+            color: #28a745;
+            font-size: 0.875rem;
+            margin-top: 0.25rem;
+        }
+        .section {
+            margin-bottom: 2rem;
+            padding: 1.5rem;
+            border: 1px solid #e9ecef;
+            border-radius: 5px;
+        }
+        .section h3 {
+            margin-top: 0;
+            color: #495057;
+        }
+        #mfaSetupModal {
+            position: fixed;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
+            background: rgba(0,0,0,0.5);
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            z-index: 1000;
+        }
+        #mfaSetupModal .modal-content {
+            background: white;
+            padding: 2rem;
+            border-radius: 10px;
+            max-width: 400px;
+            width: 100%;
+        }
+    </style>
+</head>
+<body>
+    <div class="settings-container">
+        <h1>Account Settings</h1>
+
+        <div class="section">
+            <h3>Profile Information</h3>
+            <form id="profileForm">
+                <div class="form-group">
+                    <label for="username">Username</label>
+                    <input type="text" id="username" name="username" required />
+                </div>
+                <div class="form-group">
+                    <label for="email">Email</label>
+                    <input type="email" id="email" name="email" required />
+                </div>
+                <div class="form-group">
+                    <label for="name">Full Name</label>
+                    <input type="text" id="name" name="name" />
+                </div>
+                <div class="form-group">
+                    <label for="department">Department</label>
+                    <input type="text" id="department" name="department" />
+                </div>
+                <button type="submit" class="btn btn-primary">Update Profile</button>
+                <div id="profileMessage"></div>
+            </form>
+        </div>
+
+        <div class="section">
+            <h3>Change Password</h3>
+            <form id="passwordForm">
+                <div class="form-group">
+                    <label for="currentPassword">Current Password</label>
+                    <input type="password" id="currentPassword" name="currentPassword" required />
+                </div>
+                <div class="form-group">
+                    <label for="newPassword">New Password</label>
+                    <input type="password" id="newPassword" name="newPassword" required />
+                </div>
+                <div class="form-group">
+                    <label for="confirmPassword">Confirm New Password</label>
+                    <input type="password" id="confirmPassword" name="confirmPassword" required />
+                </div>
+                <button type="submit" class="btn btn-primary">Change Password</button>
+                <div id="passwordMessage"></div>
+            </form>
+        </div>
+
+        <div class="section">
+            <h3>Multi-Factor Authentication (MFA)</h3>
+            <div id="mfaSection">
+                <p>Enhance your account security with two-factor authentication.</p>
+                <button type="button" id="setupMfaBtn" class="btn btn-primary">Setup MFA</button>
+                <button type="button" id="disableMfaBtn" class="btn btn-secondary" style="display:none;">Disable MFA</button>
+                <div id="mfaStatus"></div>
+            </div>
+
+            <div id="mfaSetupModal" style="display:none;">
+                <div class="modal-content">
+                    <h4>Setup Multi-Factor Authentication</h4>
+                    <p>Scan the QR code below with your authenticator app:</p>
+                    <div id="qrCodeContainer"></div>
+                    <p>Or enter this secret manually: <code id="mfaSecret"></code></p>
+                    <div class="form-group">
+                        <label for="mfaCode">Enter the 6-digit code from your app:</label>
+                        <input type="text" id="mfaCode" name="mfaCode" maxlength="6" required />
+                    </div>
+                    <button type="button" id="verifyMfaBtn" class="btn btn-primary">Verify & Enable</button>
+                    <button type="button" id="cancelMfaBtn" class="btn btn-secondary">Cancel</button>
+                </div>
+            </div>
+        </div>
+
+        <div class="section">
+            <h3>Notification Preferences</h3>
+            <form id="notificationForm">
+                <div class="form-group">
+                    <label>
+                        <input type="checkbox" id="emailNotifications" name="emailNotifications" />
+                        Receive email notifications
+                    </label>
+                </div>
+                <div class="form-group">
+                    <label>
+                        <input type="checkbox" id="inAppNotifications" name="inAppNotifications" checked />
+                        Receive in-app notifications
+                    </label>
+                </div>
+                <button type="submit" class="btn btn-primary">Update Preferences</button>
+                <div id="notificationMessage"></div>
+            </form>
+        </div>
+
+        <div class="btn-group">
+            <button type="button" class="btn btn-secondary" onclick="window.location.href='dashboard-enhanced.html'">Back to Dashboard</button>
+        </div>
+    </div>
+
+    <script src="https://cdn.jsdelivr.net/npm/qrcode/build/qrcode.min.js"></script>
+    <script>
+        // JavaScript to handle MFA setup and notification preferences
+
+        document.addEventListener('DOMContentLoaded', () => {
+            const setupMfaBtn = document.getElementById('setupMfaBtn');
+            const disableMfaBtn = document.getElementById('disableMfaBtn');
+            const mfaStatus = document.getElementById('mfaStatus');
+            const mfaSetupModal = document.getElementById('mfaSetupModal');
+            const qrCodeContainer = document.getElementById('qrCodeContainer');
+            const mfaSecretElem = document.getElementById('mfaSecret');
+            const mfaCodeInput = document.getElementById('mfaCode');
+            const verifyMfaBtn = document.getElementById('verifyMfaBtn');
+            const cancelMfaBtn = document.getElementById('cancelMfaBtn');
+
+            const emailNotificationsCheckbox = document.getElementById('emailNotifications');
+            const inAppNotificationsCheckbox = document.getElementById('inAppNotifications');
+            const notificationForm = document.getElementById('notificationForm');
+            const notificationMessage = document.getElementById('notificationMessage');
+
+            // Fetch current MFA status and notification preferences
+            fetch('/api/users/profile')
+                .then(res => res.json())
+                .then(data => {
+                    if (data.mfa_enabled) {
+                        mfaStatus.textContent = 'MFA is enabled on your account.';
+                        setupMfaBtn.style.display = 'none';
+                        disableMfaBtn.style.display = 'inline-block';
+                    } else {
+                        mfaStatus.textContent = 'MFA is not enabled.';
+                        setupMfaBtn.style.display = 'inline-block';
+                        disableMfaBtn.style.display = 'none';
+                    }
+                    emailNotificationsCheckbox.checked = data.email_notifications;
+                    inAppNotificationsCheckbox.checked = data.in_app_notifications;
+                });
+
+            setupMfaBtn.addEventListener('click', () => {
+                fetch('/api/mfa/setup')
+                    .then(res => res.json())
+                    .then(data => {
+                        qrCodeContainer.innerHTML = '';
+                        mfaSecretElem.textContent = data.secret;
+                        QRCode.toCanvas(qrCodeContainer, data.otpauth_url, function (error) {
+                            if (error) console.error(error);
+                        });
+                        mfaSetupModal.style.display = 'flex';
+                    });
+            });
+
+            cancelMfaBtn.addEventListener('click', () => {
+                mfaSetupModal.style.display = 'none';
+                mfaCodeInput.value = '';
+            });
+
+            verifyMfaBtn.addEventListener('click', () => {
+                const code = mfaCodeInput.value.trim();
+                if (code.length !== 6) {
+                    alert('Please enter a valid 6-digit code.');
+                    return;
+                }
+                fetch('/api/mfa/verify', {
+                    method: 'POST',
+                    headers: { 'Content-Type': 'application/json' },
+                    body: JSON.stringify({ token: code })
+                })
+                .then(res => res.json())
+                .then(data => {
+                    if (data.success) {
+                        alert('MFA has been enabled successfully.');
+                        mfaSetupModal.style.display = 'none';
+                        mfaCodeInput.value = '';
+                        mfaStatus.textContent = 'MFA is enabled on your account.';
+                        setupMfaBtn.style.display = 'none';
+                        disableMfaBtn.style.display = 'inline-block';
+                    } else {
+                        alert('Invalid code. Please try again.');
+                    }
+                });
+            });
+
+            disableMfaBtn.addEventListener('click', () => {
+                fetch('/api/mfa/disable', { method: 'POST' })
+                    .then(res => res.json())
+                    .then(data => {
+                        if (data.success) {
+                            alert('MFA has been disabled.');
+                            mfaStatus.textContent = 'MFA is not enabled.';
+                            setupMfaBtn.style.display = 'inline-block';
+                            disableMfaBtn.style.display = 'none';
+                        } else {
+                            alert('Failed to disable MFA.');
+                        }
+                    });
+            });
+
+            notificationForm.addEventListener('submit', (e) => {
+                e.preventDefault();
+                const emailNotifications = emailNotificationsCheckbox.checked;
+                const inAppNotifications = inAppNotificationsCheckbox.checked;
+                fetch('/api/users/notifications', {
+                    method: 'PUT',
+                    headers: { 'Content-Type': 'application/json' },
+                    body: JSON.stringify({ email_notifications: emailNotifications, in_app_notifications: inAppNotifications })
+                })
+                .then(res => res.json())
+                .then(data => {
+                    if (data.success) {
+                        notificationMessage.textContent = 'Notification preferences updated.';
+                        notificationMessage.className = 'success-message';
+                    } else {
+                        notificationMessage.textContent = 'Failed to update preferences.';
+                        notificationMessage.className = 'error-message';
+                    }
+                });
+            });
+        });
+    </script>
+</body>
+</html>

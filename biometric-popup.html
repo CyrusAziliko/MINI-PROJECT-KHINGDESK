@@ -1,0 +1,117 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Biometric Authentication</title>
+    <script src="https://cdn.tailwindcss.com"></script>
+    <style>
+        body {
+            font-family: 'Inter', sans-serif;
+            background: rgba(0, 0, 0, 0.5);
+            backdrop-filter: blur(10px);
+        }
+        .fingerprint-animation {
+            animation: pulse 2s infinite;
+        }
+        @keyframes pulse {
+            0% { transform: scale(1); opacity: 1; }
+            50% { transform: scale(1.1); opacity: 0.8; }
+            100% { transform: scale(1); opacity: 1; }
+        }
+        .scan-line {
+            animation: scan 2s infinite;
+        }
+        @keyframes scan {
+            0% { transform: translateY(-100%); }
+            100% { transform: translateY(100%); }
+        }
+    </style>
+</head>
+<body class="flex items-center justify-center min-h-screen">
+    <div class="bg-white dark:bg-slate-800 rounded-2xl p-8 max-w-md w-full mx-4 shadow-2xl">
+        <div class="text-center">
+            <div class="relative w-32 h-32 mx-auto mb-6">
+                <div class="absolute inset-0 rounded-full bg-gradient-to-r from-indigo-500 to-purple-600 opacity-20 fingerprint-animation"></div>
+                <div class="relative w-full h-full rounded-full bg-gradient-to-r from-indigo-500 to-purple-600 flex items-center justify-center">
+                    <svg xmlns="http://www.w3.org/2000/svg" class="h-16 w-16 text-white" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                        <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 11c0 3.517-1.009 6.799-2.753 9.571m-3.44-2.04l.054-.09A13.916 13.916 0 008 11a4 4 0 118 0c0 1.017-.07 2.019-.203 3m-2.118 6.844A21.88 21.88 0 0015.171 17m3.839 1.132c.645-2.266.99-4.659.99-7.132A8 8 0 008 4.07m3 3.186A7.989 7.989 0 0116 12c0 .665-.07 1.314-.203 1.936M6.228 6.228A15.98 15.98 0 0112 6c3.337 0 6.379 1.255 8.65 3.316m-4.345 8.49a9 9 0 01-4.02-7.039l1.267-1.268M6 6.02a15.978 15.978 0 01-.832 2.449m10.723 5.002a15.981 15.981 0 01-.41 2.446M6.228 6.228l2.448 2.448M17.18 17.18l-2.427-2.427" />
+                    </svg>
+                </div>
+                <div class="absolute top-0 left-0 w-full h-full rounded-full overflow-hidden">
+                    <div class="scan-line w-full h-1 bg-gradient-to-r from-transparent via-white to-transparent opacity-75"></div>
+                </div>
+            </div>
+            
+            <h2 class="text-2xl font-bold text-gray-800 dark:text-white mb-2">Biometric Authentication</h2>
+            <p class="text-gray-600 dark:text-gray-300 mb-6">Please place your finger on the fingerprint scanner to verify your identity</p>
+            
+            <div class="space-y-4">
+                <div class="bg-gray-100 dark:bg-gray-700 rounded-lg p-4">
+                    <p class="text-sm text-gray-600 dark:text-gray-300">User: <span id="selected-user-name" class="font-semibold text-indigo-600 dark:text-indigo-400">Loading...</span></p>
+                </div>
+                
+                <div class="flex items-center justify-center space-x-2">
+                    <div class="w-2 h-2 bg-green-500 rounded-full animate-pulse"></div>
+                    <span class="text-sm text-green-600 dark:text-green-400">Scanner ready</span>
+                </div>
+                
+                <div class="w-full bg-gray-200 dark:bg-gray-600 rounded-full h-2">
+                    <div id="progress-bar" class="bg-gradient-to-r from-indigo-500 to-purple-600 h-2 rounded-full transition-all duration-300" style="width: 0%"></div>
+                </div>
+                
+                <button id="cancel-auth" class="w-full px-4 py-2 bg-gray-200 dark:bg-gray-600 text-gray-700 dark:text-gray-300 rounded-lg hover:bg-gray-300 dark:hover:bg-gray-500 transition-colors">
+                    Cancel
+                </button>
+            </div>
+        </div>
+    </div>
+
+    <script>
+        // Get selected user from parent window
+        const selectedUser = window.opener ? window.opener.selectedUser : null;
+        
+        // Update user name display
+        if (selectedUser) {
+            document.getElementById('selected-user-name').textContent = selectedUser.name;
+        }
+
+        // Simulate biometric authentication
+        let progress = 0;
+        const progressBar = document.getElementById('progress-bar');
+        const interval = setInterval(() => {
+            progress += Math.random() * 15;
+            if (progress >= 100) {
+                progress = 100;
+                clearInterval(interval);
+                
+                // Send success message to parent
+                if (window.opener) {
+                    window.opener.postMessage({ type: 'biometric-success', user: selectedUser }, '*');
+                }
+                
+                // Close popup after brief delay
+                setTimeout(() => {
+                    window.close();
+                }, 1000);
+            }
+            progressBar.style.width = progress + '%';
+        }, 200);
+
+        // Cancel button
+        document.getElementById('cancel-auth').addEventListener('click', () => {
+            if (window.opener) {
+                window.opener.postMessage({ type: 'biometric-cancel' }, '*');
+            }
+            window.close();
+        });
+
+        // Handle window close
+        window.addEventListener('beforeunload', () => {
+            if (window.opener) {
+                window.opener.postMessage({ type: 'biometric-cancel' }, '*');
+            }
+        });
+    </script>
+</body>
+</html>

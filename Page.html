@@ -1,0 +1,2030 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>VaultDesk: Biometric-Secured Worker Support Portal</title>
+    <script src="https://cdn.tailwindcss.com"></script>
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700&display=swap" rel="stylesheet">
+    <link rel="stylesheet" href="enhanced-styles.css">
+    <link rel="stylesheet" href="animations-enhanced.css">
+    <style>
+        /* Additional custom styles */
+        body {
+            font-family: 'Inter', sans-serif;
+            background: url('background mine.jpg') center center/cover no-repeat, linear-gradient(135deg, #f8fafc, #e2e8f0);
+            min-height: 100vh;
+            overflow-x: hidden;
+        }
+        
+        .dark body {
+            background: url('background mine.jpg') center center/cover no-repeat, linear-gradient(135deg, #0f172a, #1e293b);
+        }
+        
+        /* Custom scrollbar for webkit browsers */
+        ::-webkit-scrollbar {
+            width: 12px;
+        }
+
+        ::-webkit-scrollbar-track {
+            background: rgba(241, 245, 249, 0.5);
+        }
+
+        .dark ::-webkit-scrollbar-track {
+            background: rgba(15, 23, 42, 0.5);
+        }
+
+        ::-webkit-scrollbar-thumb {
+            background: linear-gradient(180deg, #6366f1, #8b5cf6);
+            border-radius: 6px;
+        }
+
+        ::-webkit-scrollbar-thumb:hover {
+            background: linear-gradient(180deg, #4f46e5, #7c3aed);
+        }
+
+        /* Animation trigger classes */
+        .animate-on-load {
+            animation: fadeInUp 1s ease-out;
+        }
+
+        .stagger-1 { animation-delay: 0.1s; }
+        .stagger-2 { animation-delay: 0.2s; }
+        .stagger-3 { animation-delay: 0.3s; }
+        .stagger-4 { animation-delay: 0.4s; }
+        .stagger-5 { animation-delay: 0.5s; }
+    </style>
+</head>
+<body class="bg-slate-50 dark:bg-slate-900 transition-colors duration-300">
+    <div class="fixed top-5 right-5 z-50 flex items-center space-x-3">
+        <button id="notification-toggle" class="bg-white dark:bg-slate-800 text-gray-800 dark:text-white p-2 rounded-full shadow-lg relative">
+            <svg xmlns="http://www.w3.org/2000/svg" class="h-6 w-6" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M15 17h5l-5 5v-5zM4.868 12.683A17.925 17.925 0 012 21h13.78a17.925 17.925 0 01-1.868-8.317M12 2.25c-2.5 0-4.5 2-4.5 4.5v3.75a7.5 7.5 0 001.5 14.25v.75a.75.75 0 01-.75.75H6a.75.75 0 01-.75-.75v-.75a7.5 7.5 0 001.5-14.25V6.75a4.5 4.5 0 019 0v3.75a7.5 7.5 0 001.5 14.25v.75a.75.75 0 01-.75.75h-1.5a.75.75 0 01-.75-.75v-.75a7.5 7.5 0 00-7.5-7.5z" />
+            </svg>
+            <span id="notification-badge" class="absolute -top-1 -right-1 bg-red-500 text-white text-xs rounded-full h-5 w-5 flex items-center justify-center hidden">0</span>
+        </button>
+        <div id="notification-dropdown" class="hidden fixed top-14 right-5 w-80 max-h-96 bg-white dark:bg-slate-800 rounded-lg shadow-lg overflow-hidden flex flex-col z-50">
+            <div class="px-4 py-2 border-b border-gray-200 dark:border-gray-700 font-semibold text-gray-800 dark:text-gray-200">
+                Notifications
+            </div>
+            <div id="notification-list" class="flex-1 overflow-y-auto">
+                <!-- Notifications will be dynamically added here -->
+                <p class="text-center text-gray-500 dark:text-gray-400 mt-4">No new notifications</p>
+            </div>
+            <div class="px-4 py-2 border-t border-gray-200 dark:border-gray-700 flex justify-between">
+                <button id="mark-all-read" class="text-sm text-indigo-600 dark:text-indigo-400 hover:underline focus:outline-none">Mark all as read</button>
+                <button id="view-all" class="text-sm text-indigo-600 dark:text-indigo-400 hover:underline focus:outline-none">View all</button>
+            </div>
+        </div>
+        <button id="theme-toggle" class="bg-white dark:bg-slate-800 text-gray-800 dark:text-white p-2 rounded-full shadow-lg">
+            <svg id="sun-icon" xmlns="http://www.w3.org/2000/svg" class="h-6 w-6" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 3v1m0 16v1m9-9h-1M4 12H3m15.364 6.364l-.707-.707M6.343 6.343l-.707-.707m12.728 0l-.707.707M6.343 17.657l-.707.707M16 12a4 4 0 11-8 0 4 4 0 018 0z" />
+            </svg>
+            <svg id="moon-icon" xmlns="http://www.w3.org/2000/svg" class="h-6 w-6 hidden" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M20.354 15.354A9 9 0 018.646 3.646 9.003 9.003 0 0012 21a9.003 9.003 0 008.354-5.646z" />
+            </svg>
+        </button>
+    </div>
+
+    <!-- Static Background Elements -->
+    <div class="static-bg-object circle" style="top: 10%; left: 5%;"></div>
+    <div class="static-bg-object square" style="top: 20%; right: 10%;"></div>
+    <div class="static-bg-object triangle" style="bottom: 15%; left: 15%;"></div>
+    <div class="static-bg-object hexagon" style="bottom: 25%; right: 20%;"></div>
+    
+    <!-- Static Elements -->
+    <div class="static-element ball" style="top: 30%; left: 80%;"></div>
+    <div class="static-element cube" style="top: 70%; left: 10%;"></div>
+    
+    <!-- Static Decorative Elements -->
+    <div class="static-element diamond" style="top: 15%; right: 15%;"></div>
+    <div class="static-element star" style="bottom: 10%; left: 40%;"></div>
+    
+    <!-- Static Sparkle Effects -->
+    <div class="static-sparkle" style="top: 25%; left: 30%;"></div>
+    <div class="static-sparkle" style="top: 60%; right: 25%;"></div>
+    <div class="static-sparkle" style="bottom: 20%; left: 60%;"></div>
+    <div class="static-sparkle" style="top: 40%; left: 70%;"></div>
+    
+    <!-- Static Wave Elements -->
+    <div class="static-wave" style="top: 50%; left: 20%;"></div>
+    <div class="static-wave" style="top: 75%; right: 30%;"></div>
+    
+    <!-- Static Particle Effects -->
+    <div class="static-particle" style="top: 35%; left: 45%;"></div>
+    <div class="static-particle" style="top: 55%; right: 15%;"></div>
+    <div class="static-particle" style="bottom: 30%; left: 25%;"></div>
+    <div class="static-particle" style="top: 80%; left: 65%;"></div>
+
+    <div id="auth-modal" class="fixed inset-0 flex items-center justify-center z-50 backdrop-blur-md">
+        <div class="bg-white dark:bg-slate-800 rounded-2xl p-8 max-w-md w-full mx-4 glassmorphism relative overflow-hidden modal-content">
+            <div class="absolute -top-20 -right-20 w-40 h-40 bg-purple-500 rounded-full opacity-10"></div>
+            <div class="absolute -bottom-20 -left-20 w-40 h-40 bg-indigo-500 rounded-full opacity-10"></div>
+            
+            <div class="text-center mb-6">
+                <div class="flex justify-center mb-4">
+                    <div class="w-16 h-16 rounded-full bg-gradient-to-r from-indigo-500 to-purple-600 flex items-center justify-center neon-effect">
+                        <svg xmlns="http://www.w3.org/2000/svg" class="h-8 w-8 text-white" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 15v2m-6 4h12a2 2 0 002-2v-6a2 2 0 00-2-2H6a2 2 0 00-2 2v6a2 2 0 002 2zm10-10V7a4 4 0 00-8 0v4h8z" />
+                        </svg>
+                    </div>
+                </div>
+                <h2 class="text-3xl font-bold text-gray-800 dark:text-white">KhingDesk</h2>
+                <p class="text-gray-600 dark:text-gray-300 mt-2">Biometric-Secured Worker Portal</p>
+                <div class="mt-2 flex items-center justify-center">
+                    <span class="security-indicator strong">
+                        <svg xmlns="http://www.w3.org/2000/svg" class="h-4 w-4 mr-1" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 15v2m-6 4h12a2 2 0 002-2v-6a2 2 0 00-2-2H6a2 2 0 00-2 2v6a2 2 0 002 2zm10-10V7a4 4 0 00-8 0v4h8z" />
+                        </svg>
+                        Military-Grade Encryption
+                    </span>
+                </div>
+            </div>
+            
+            <div class="flex flex-col space-y-4">
+                <div class="flex justify-center mb-2">
+                    <button id="biometric-tab" class="px-4 py-2 rounded-t-lg bg-indigo-600 text-white font-semibold neon-effect">Biometric</button>
+                    <button id="password-tab" class="px-4 py-2 rounded-t-lg bg-gray-200 text-gray-700 font-semibold">Password</button>
+                </div>
+                <div id="biometric-login-section">
+                    <div class="mb-4">
+                        <label for="users" class="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-2">Select User</label>
+                        <select id="users" class="bg-gray-50 border border-gray-300 text-gray-900 text-sm rounded-lg focus:ring-indigo-500 focus:border-indigo-500 block w-full p-2.5 dark:bg-gray-700 dark:border-gray-600 dark:placeholder-gray-400 dark:text-white search-bar">
+                            <option value="" disabled selected>Select your profile</option>
+                            <option value="cyrus">Cyrus Aziliko - ICT</option>
+                            <option value="emmanuella">Emmanuella Mensah - Health</option>
+                            <option value="Uriel">Uriel Aziliko - Engineering</option>
+                            <option value="Zipporah">Zipporah Aziliko - Admin</option>
+                            <option value="Peter">Peter Aziliko - Security</option>
+                            <option value="cecilia">Cecilia Tenkorang - Legal</option>
+                            <option value="akosua">Akosua Brempomaa - Accounts</option>
+                            <option value="goldstreet">Goldstreet Aziliko - Logistics</option>
+                        </select>
+                    </div>
+                    <div class="floating">
+                        <img src="Gold.jpg" alt="Abstract vault door with digital lock and biometric scanner" class="w-40 h-40 mx-auto rounded-full avatar-circle neon-effect">
+                    </div>
+                    <p class="text-center text-gray-600 dark:text-gray-300 mt-4">Authenticate to access your secure vault</p>
+                    <div class="mt-2 text-center">
+                        <span class="inline-flex items-center px-2.5 py-0.5 rounded-full text-xs font-medium bg-green-100 text-green-800 dark:bg-green-900 dark:text-green-200">
+                            <svg xmlns="http://www.w3.org/2000/svg" class="h-3 w-3 mr-1" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M5 13l4 4L19 7" />
+                            </svg>
+                            Biometric scanner ready
+                        </span>
+                    </div>
+                    <button id="biometric-auth" class="biometric-btn bg-gradient-to-r from-indigo-500 to-purple-600 text-white py-3 px-6 rounded-full font-medium mt-4 flex items-center justify-center space-x-2 neon-effect hover:from-indigo-600 hover:to-purple-700 transition-all duration-300" disabled>
+                        <svg xmlns="http://www.w3.org/2000/svg" class="h-5 w-5" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 11c0 3.517-1.009 6.799-2.753 9.571m-3.44-2.04l.054-.09A13.916 13.916 0 008 11a4 4 0 118 0c0 1.017-.07 2.019-.203 3m-2.118 6.844A21.88 21.88 0 0015.171 17m3.839 1.132c.645-2.266.99-4.659.99-7.132A8 8 0 008 4.07m3 3.186A7.989 7.989 0 0116 12c0 .665-.07 1.314-.203 1.936M6.228 6.228A15.98 15.98 0 0112 6c3.337 0 6.379 1.255 8.65 3.316m-4.345 8.49a9 9 0 01-4.02-7.039l1.267-1.268M6 6.02a15.978 15.978 0 01-.832 2.449m10.723 5.002a15.981 15.981 0 01-.41 2.446M6.228 6.228l2.448 2.448M17.18 17.18l-2.427-2.427" />
+                        </svg>
+                        <span>Use Biometric Authentication</span>
+                    </button>
+                </div>
+                <form id="password-login-section" class="hidden flex flex-col space-y-4">
+                    <div>
+                        <label for="password-user" class="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-2">Select User</label>
+                        <select id="password-user" class="bg-gray-50 border border-gray-300 text-gray-900 text-sm rounded-lg focus:ring-indigo-500 focus:border-indigo-500 block w-full p-2.5 dark:bg-gray-700 dark:border-gray-600 dark:placeholder-gray-400 dark:text-white search-bar">
+                            <option value="" disabled selected>Select your profile</option>
+                            <option value="cyrus">Cyrus Aziliko - ICT</option>
+                            <option value="emmanuella">Emmanuella Mensah - Health</option>
+                            <option value="Uriel">Uriel Aziliko - Engineering</option>
+                            <option value="Zipporah">Zipporah Aziliko - Admin</option>
+                            <option value="Peter">Peter Aziliko - Security</option>
+                            <option value="cecilia">Cecilia Tenkorang - Legal</option>
+                            <option value="akosua">Akosua Brempomaa - Accounts</option>
+                            <option value="goldstreet">Goldstreet Aziliko - Logistics</option>
+                        </select>
+                    </div>
+                    <div>
+                        <label for="user-password" class="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-2">Password</label>
+                        <input type="password" id="user-password" class="bg-gray-50 border border-gray-300 text-gray-900 text-sm rounded-lg focus:ring-indigo-500 focus:border-indigo-500 block w-full p-2.5 dark:bg-gray-700 dark:border-gray-600 dark:placeholder-gray-400 dark:text-white search-bar" placeholder="Enter your password" required>
+                        <div class="mt-1">
+                            <div class="password-strength">
+                                <div class="password-strength-fill w-0 bg-gray-300"></div>
+                            </div>
+                        </div>
+                        <div class="mt-2 text-right">
+                            <a href="public/reset-password.html" class="text-sm text-indigo-600 dark:text-indigo-400 hover:text-indigo-800 dark:hover:text-indigo-300 hover:underline transition-colors">
+                                Forgot Password?
+                            </a>
+                        </div>
+                    </div>
+                    <button type="submit" class="bg-indigo-600 hover:bg-indigo-700 text-white py-2 px-6 rounded-lg font-medium transition-colors neon-effect">
+                        Login with Password
+                    </button>
+                    <div id="password-login-error" class="text-red-500 text-sm mt-2 hidden text-center"></div>
+                </form>
+            </div>
+            
+            <div class="mt-6 text-center text-xs text-gray-500 dark:text-gray-400">
+                <p>© 2023 KhingDesk. All rights reserved.</p>
+                <p class="mt-1">Securely encrypted with AES-256</p>
+            </div>
+        </div>
+    </div>
+
+    <div id="app-content" class="hidden page-transition">
+        <!-- Floating Navigation -->
+        <nav class="fixed bottom-5 right-5 z-40">
+            <div class="flex flex-col items-center space-y-3">
+                <button id="toggle-vault" class="floating bg-indigo-600 text-white w-12 h-12 rounded-full flex items-center justify-center shadow-lg hover:bg-indigo-700 transition-all neon-effect">
+                    <svg xmlns="http://www.w3.org/2000/svg" class="h-6 w-6" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                        <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 15v2m-6 4h12a2 2 0 002-2v-6a2 2 0 00-2-2H6a2 2 0 00-2 2v6a2 2 0 002 2zm10-10V7a4 4 0 00-8 0v4h8z" />
+                    </svg>
+                </button>
+                
+                <button id="toggle-helpdesk" class="floating bg-purple-600 text-white w-12 h-12 rounded-full flex items-center justify-center shadow-lg hover:bg-purple-700 transition-all neon-effect">
+                    <svg xmlns="http://www.w3.org/2000/svg" class="h-6 w-6" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                        <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M8 10h.01M12 10h.01M16 10h.01M9 16H5a2 2 0 01-2-2V6a2 2 0 012-2h14a2 2 0 012 2v8a2 2 0 01-2 2h-5l-5 5v-5z" />
+                    </svg>
+                </button>
+                
+                <button id="logout-btn" class="floating bg-red-500 text-white w-12 h-12 rounded-full flex items-center justify-center shadow-lg hover:bg-red-600 transition-all">
+                    <svg xmlns="http://www.w3.org/2000/svg" class="h-6 w-6" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                        <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M17 16l4-4m0 0l-4-4m4 4H7m6 4v1a3 3 0 01-3 3H6a3 3 0 01-3-3V7a3 3 0 013-3h4a3 3 0 013 3v1" />
+                    </svg>
+                </button>
+                
+                <button id="open-admin-login" class="floating bg-yellow-500 text-white w-12 h-12 rounded-full flex items-center justify-center shadow-lg hover:bg-yellow-600 transition-all neon-effect mt-3" title="Admin Panel">
+                    <svg xmlns="http://www.w3.org/2000/svg" class="h-6 w-6" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                        <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 4v16m8-8H4" />
+                    </svg>
+                </button>
+            </div>
+        </nav>
+
+        <!-- User Dashboard -->
+        <div id="user-dashboard" class="container mx-auto px-4 py-8 page-transition">
+            <!-- User Profile Header -->
+            <div class="flex flex-col md:flex-row items-center justify-between mb-8">
+                <div class="flex items-center space-x-4">
+                    <div class="relative">
+                        <img id="user-avatar" src="https://placehold.co/150x150" alt="" class="w-20 h-20 rounded-full shadow-md avatar-circle neon-effect">
+                        <div id="auth-indicator" class="absolute bottom-0 right-0 w-5 h-5 bg-green-500 rounded-full border-2 border-white"></div>
+                    </div>
+                    <div>
+                        <h1 id="user-name" class="text-2xl font-bold text-gray-800 dark:text-white"></h1>
+                        <p id="user-dept" class="text-gray-600 dark:text-gray-300"></p>
+                        <div class="flex items-center mt-1">
+                            <span class="security-indicator strong">
+                                <svg xmlns="http://www.w3.org/2000/svg" class="h-4 w-4 mr-1" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                                    <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 15v2m-6 4h12a2 2 0 002-2v-6a2 2 0 00-2-2H6a2 2 0 00-2 2v6a2 2 0 002 2zm10-10V7a4 4 0 00-8 0v4h8z" />
+                                </svg>
+                                Secure Session
+                            </span>
+                        </div>
+                    </div>
+                </div>
+                <div class="mt-4 md:mt-0">
+                    <div class="px-4 py-2 bg-gradient-to-r from-indigo-100 to-purple-100 dark:from-indigo-900 dark:to-purple-900 rounded-full text-indigo-800 dark:text-indigo-200 font-medium neon-effect">
+                        <span id="welcome-message">Welcome back!</span>
+                    </div>
+                </div>
+            </div>
+
+            <!-- Dashboard Stats -->
+            <div class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-4 mb-8">
+                <div class="stat-card bg-white dark:bg-slate-800 rounded-xl p-4 shadow-sm glassmorphism">
+                    <div class="flex items-center">
+                        <div class="p-3 rounded-lg bg-indigo-100 dark:bg-indigo-900">
+                            <svg xmlns="http://www.w3.org/2000/svg" class="h-6 w-6 text-indigo-600 dark:text-indigo-400" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 15v2m-6 4h12a2 2 0 002-2v-6a2 2 0 00-2-2H6a2 2 0 00-2 2v6a2 2 0 002 2zm10-10V7a4 4 0 00-8 0v4h8z" />
+                            </svg>
+                        </div>
+                        <div class="ml-4">
+                            <p class="text-sm font-medium text-gray-500 dark:text-gray-400">Vault Items</p>
+                            <p id="vault-count" class="text-2xl font-bold text-gray-900 dark:text-white">0</p>
+                        </div>
+                    </div>
+                </div>
+                
+                <div class="stat-card bg-white dark:bg-slate-800 rounded-xl p-4 shadow-sm glassmorphism">
+                    <div class="flex items-center">
+                        <div class="p-3 rounded-lg bg-green-100 dark:bg-green-900">
+                            <svg xmlns="http://www.w3.org/2000/svg" class="h-6 w-6 text-green-600 dark:text-green-400" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 12l2 2 4-4m6 2a9 9 0 11-18 0 9 9 0 0118 0z" />
+                            </svg>
+                        </div>
+                        <div class="ml-4">
+                            <p class="text-sm font-medium text-gray-500 dark:text-gray-400">Resolved Tickets</p>
+                            <p id="resolved-tickets" class="text-2xl font-bold text-gray-900 dark:text-white">0</p>
+                        </div>
+                    </div>
+                </div>
+                
+                <div class="stat-card bg-white dark:bg-slate-800 rounded-xl p-4 shadow-sm glassmorphism">
+                    <div class="flex items-center">
+                        <div class="p-3 rounded-lg bg-blue-100 dark:bg-blue-900">
+                            <svg xmlns="http://www.w3.org/2000/svg" class="h-6 w-6 text-blue-600 dark:text-blue-400" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M8 10h.01M12 10h.01M16 10h.01M9 16H5a2 2 0 01-2-2V6a2 2 0 012-2h14a2 2 0 012 2v8a2 2 0 01-2 2h-5l-5 5v-5z" />
+                            </svg>
+                        </div>
+                        <div class="ml-4">
+                            <p class="text-sm font-medium text-gray-500 dark:text-gray-400">Open Tickets</p>
+                            <p id="open-tickets" class="text-2xl font-bold text-gray-900 dark:text-white">0</p>
+                        </div>
+                    </div>
+                </div>
+                
+                <div class="stat-card bg-white dark:bg-slate-800 rounded-xl p-4 shadow-sm glassmorphism">
+                    <div class="flex items-center">
+                        <div class="p-3 rounded-lg bg-purple-100 dark:bg-purple-900">
+                            <svg xmlns="http://www.w3.org/2000/svg" class="h-6 w-6 text-purple-600 dark:text-purple-400" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 8v4l3 3m6-3a9 9 0 11-18 0 9 9 0 0118 0z" />
+                            </svg>
+                        </div>
+                        <div class="ml-4">
+                            <p class="text-sm font-medium text-gray-500 dark:text-gray-400">Last Login</p>
+                            <p id="last-login" class="text-2xl font-bold text-gray-900 dark:text-white">Today</p>
+                        </div>
+                    </div>
+                </div>
+            </div>
+
+            <!-- Account Information Section -->
+            <div id="account-info-section" class="mb-8">
+                <h2 class="text-xl font-semibold text-gray-800 dark:text-white mb-4">My Account</h2>
+                <div class="bg-white dark:bg-slate-800 rounded-xl p-4 shadow-sm glassmorphism">
+                    <div class="flex items-center justify-between">
+                        <div>
+                            <p class="text-sm font-medium text-gray-700 dark:text-gray-300">Login Password</p>
+                            <p id="user-login-password" class="font-mono text-lg text-gray-800 dark:text-white mt-1"></p>
+                        </div>
+                        <button id="copy-password-btn" class="bg-indigo-100 dark:bg-indigo-900 text-indigo-600 dark:text-indigo-300 px-3 py-1 rounded-md text-sm font-medium hover:bg-indigo-200 dark:hover:bg-indigo-800 transition-colors flex items-center space-x-2 neon-effect">
+                            <svg xmlns="http://www.w3.org/2000/svg" class="h-4 w-4" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 5H7a2 2 0 00-2 2v12a2 2 0 002 2h10a2 2 0 002-2V7a2 2 0 00-2-2h-2M9 5a2 2 0 002 2h2a2 2 0 002-2M9 5a2 2 0 012-2h2a2 2 0 012 2" />
+                            </svg>
+                            <span>Copy</span>
+                        </button>
+                    </div>
+                </div>
+            </div>
+
+            <!-- Vault Section -->
+            <div id="vault-section" class="mb-8">
+                <div class="flex items-center justify-between mb-4">
+                    <h2 class="text-xl font-semibold text-gray-800 dark:text-white">My Secure Vault</h2>
+                    <div class="flex space-x-2">
+                        <div class="relative">
+                            <input type="text" id="vault-search" placeholder="Search vault items..." class="pl-10 pr-4 py-2 bg-white dark:bg-slate-800 border border-gray-300 dark:border-gray-600 rounded-lg text-sm focus:ring-indigo-500 focus:border-indigo-500 search-bar">
+                            <svg xmlns="http://www.w3.org/2000/svg" class="h-5 w-5 text-gray-400 absolute left-3 top-2.5" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M21 21l-6-6m2-5a7 7 0 11-14 0 7 7 0 0114 0z" />
+                            </svg>
+                        </div>
+                        <button id="add-vault-item" class="text-indigo-600 dark:text-indigo-400 hover:text-indigo-800 dark:hover:text-indigo-300 transition-colors neon-effect p-2 rounded-lg">
+                            <svg xmlns="http://www.w3.org/2000/svg" class="h-6 w-6" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 6v6m0 0v6m0-6h6m-6 0H6" />
+                            </svg>
+                        </button>
+                    </div>
+                </div>
+                
+                <div class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-4">
+                    <!-- Vault items will be populated here -->
+                </div>
+            </div>
+
+            <!-- Help Desk Section -->
+            <div id="helpdesk-section" class="hidden">
+                <div class="flex items-center justify-between mb-4">
+                    <h2 class="text-xl font-semibold text-gray-800 dark:text-white">Help Desk</h2>
+                </div>
+                
+                <div class="bg-white dark:bg-slate-800 rounded-xl shadow-md p-6 mb-6 glassmorphism">
+                    <h3 class="text-lg font-medium text-gray-800 dark:text-white mb-4">Submit New Request</h3>
+                    <form id="ticket-form">
+                        <div class="mb-4">
+                            <label for="ticket-subject" class="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-2">Subject</label>
+                            <input type="text" id="ticket-subject" class="bg-gray-50 border border-gray-300 text-gray-900 text-sm rounded-lg focus:ring-indigo-500 focus:border-indigo-500 block w-full p-2.5 dark:bg-gray-700 dark:border-gray-600 dark:placeholder-gray-400 dark:text-white search-bar" placeholder="What's the issue?" required>
+                        </div>
+                        <div class="mb-4">
+                            <label for="ticket-description" class="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-2">Description</label>
+                            <textarea id="ticket-description" rows="3" class="bg-gray-50 border border-gray-300 text-gray-900 text-sm rounded-lg focus:ring-indigo-500 focus:border-indigo-500 block w-full p-2.5 dark:bg-gray-700 dark:border-gray-600 dark:placeholder-gray-400 dark:text-white search-bar" placeholder="Provide more details about your issue..." required></textarea>
+                        </div>
+                        <div class="mb-4">
+                            <label for="ticket-priority" class="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-2">Priority</label>
+                            <select id="ticket-priority" class="bg-gray-50 border border-gray-300 text-gray-900 text-sm rounded-lg focus:ring-indigo-500 focus:border-indigo-500 block w-full p-2.5 dark:bg-gray-700 dark:border-gray-600 dark:placeholder-gray-400 dark:text-white search-bar">
+                                <option value="low">Low</option>
+                                <option value="medium" selected>Medium</option>
+                                <option value="high">High</option>
+                                <option value="urgent">Urgent</option>
+                            </select>
+                        </div>
+                        <button type="submit" class="bg-indigo-600 hover:bg-indigo-700 text-white py-2 px-6 rounded-lg font-medium transition-colors neon-effect">
+                            Submit Ticket
+                        </button>
+                    </form>
+                </div>
+                
+                <div>
+                    <h3 class="text-lg font-medium text-gray-800 dark:text-white mb-4">My Tickets</h3>
+                    <div id="ticket-list" class="space-y-4">
+                        <!-- Tickets will be populated here -->
+                    </div>
+                </div>
+
+                <!-- Chatbot Assistant Section -->
+                <div class="mt-8">
+                    <h3 class="text-lg font-medium text-gray-800 dark:text-white mb-4">Chatbot Assistant</h3>
+                    <div class="bg-white dark:bg-slate-800 rounded-xl shadow-md p-4 mb-4 glassmorphism">
+                        <div id="chatbot-window" class="h-64 overflow-y-auto flex flex-col space-y-2 mb-4">
+                            <!-- Chat messages will appear here -->
+                        </div>
+                        <div class="flex flex-wrap gap-2 mb-4">
+                            <button class="chatbot-category-btn bg-indigo-100 dark:bg-indigo-900 text-indigo-800 dark:text-indigo-200 text-xs px-3 py-1 rounded-full" data-category="IT">IT & Technical</button>
+                            <button class="chatbot-category-btn bg-green-100 dark:bg-green-900 text-green-800 dark:text-green-200 text-xs px-3 py-1 rounded-full" data-category="Safety">Safety & Operational</button>
+                            <button class="chatbot-category-btn bg-blue-100 dark:bg-blue-900 text-blue-800 dark:text-blue-200 text-xs px-3 py-1 rounded-full" data-category="Equipment">Equipment & Maintenance</button>
+                            <button class="chatbot-category-btn bg-yellow-100 dark:bg-yellow-900 text-yellow-800 dark:text-yellow-200 text-xs px-3 py-1 rounded-full" data-category="HR">HR & Admin</button>
+                            <button class="chatbot-category-btn bg-purple-100 dark:bg-purple-900 text-purple-800 dark:text-purple-200 text-xs px-3 py-1 rounded-full" data-category="General">General & Logistics</button>
+                        </div>
+                        <div id="chatbot-questions-container" class="mb-4">
+                            <!-- Questions will be populated here based on category -->
+                        </div>
+                        <form id="chatbot-form" class="flex space-x-2">
+                            <input id="chatbot-input" type="text" class="flex-1 bg-gray-50 border border-gray-300 text-gray-900 text-sm rounded-lg focus:ring-indigo-500 focus:border-indigo-500 p-2.5 dark:bg-gray-700 dark:border-gray-600 dark:text-white search-bar" placeholder="Ask the help desk bot..." autocomplete="off">
+                            <button type="submit" class="bg-indigo-600 hover:bg-indigo-700 text-white px-4 py-2 rounded-lg font-medium neon-effect">Send</button>
+                        </form>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <!-- Add Vault Item Modal -->
+    <div id="add-item-modal" class="fixed inset-0 flex items-center justify-center z-50 backdrop-blur-sm hidden">
+        <div class="bg-white dark:bg-slate-800 rounded-xl p-6 w-full max-w-md mx-4 glassmorphism">
+            <h3 class="text-xl font-semibold text-gray-800 dark:text-white mb-4">Add New Vault Item</h3>
+            
+            <form id="add-item-form">
+                <div class="mb-4">
+                    <label for="item-name" class="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-2">Item Name</label>
+                    <input type="text" id="item-name" class="bg-gray-50 border border-gray-300 text-gray-900 text-sm rounded-lg focus:ring-indigo-500 focus:border-indigo-500 block w-full p-2.5 dark:bg-gray-700 dark:border-gray-600 dark:placeholder-gray-400 dark:text-white" placeholder="Name of the item" required>
+                </div>
+                
+                <div class="mb-4">
+                    <label class="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-2">Item Type</label>
+                    <div class="grid grid-cols-2 gap-3">
+                        <div>
+                            <input type="radio" id="type-credential" name="item-type" value="credential" class="hidden peer" checked>
+                            <label for="type-credential" class="flex items-center justify-center p-2 border border-gray-300 rounded-lg cursor-pointer hover:bg-gray-100 peer-checked:border-indigo-500 peer-checked:bg-indigo-50 dark:border-gray-600 dark:hover:bg-gray-700 dark:peer-checked:bg-slate-700 dark:peer-checked:border-indigo-500">
+                                <svg xmlns="http://www.w3.org/2000/svg" class="h-5 w-5 mr-2" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                                    <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 15v2m-6 4h12a2 2 0 002-2v-6a2 2 0 00-2-2H6a2 2 0 00-2 2v6a2 2 0 002 2zm10-10V7a4 4 0 00-8 0v4h8z" />
+                                </svg>
+                                Credential
+                            </label>
+                        </div>
+                        <div>
+                            <input type="radio" id="type-document" name="item-type" value="document" class="hidden peer">
+                            <label for="type-document" class="flex items-center justify-center p-2 border border-gray-300 rounded-lg cursor-pointer hover:bg-gray-100 peer-checked:border-indigo-500 peer-checked:bg-indigo-50 dark:border-gray-600 dark:hover:bg-gray-700 dark:peer-checked:bg-slate-700 dark:peer-checked:border-indigo-500">
+                                <svg xmlns="http://www.w3.org/2000/svg" class="h-5 w-5 mr-2" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                                    <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M11 5H6a2 2 0 00-2 2v11a2 2 0 002 2h11a2 2 0 002-2v-5m-1.414-9.414a2 2 0 112.828 2.828L11.828 15H9v-2.828l8.586-8.586z" />
+                                </svg>
+                                Note
+                            </label>
+                        </div>
+                        <div>
+                            <input type="radio" id="type-link" name="item-type" value="link" class="hidden peer">
+                            <label for="type-link" class="flex items-center justify-center p-2 border border-gray-300 rounded-lg cursor-pointer hover:bg-gray-100 peer-checked:border-indigo-500 peer-checked:bg-indigo-50 dark:border-gray-600 dark:hover:bg-gray-700 dark:peer-checked:bg-slate-700 dark:peer-checked:border-indigo-500">
+                                <svg xmlns="http://www.w3.org/2000/svg" class="h-5 w-5 mr-2" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                                    <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M13.828 10.172a4 4 0 00-5.656 0l-4 4a4 4 0 105.656 5.656l1.102-1.101m-.758-4.899a4 4 0 005.656 0l4-4a4 4 0 00-5.656-5.656l-1.1 1.1" />
+                                </svg>
+                                Link
+                            </label>
+                        </div>
+                    </div>
+                </div>
+                
+                <div id="credential-fields" class="space-y-4">
+                    <div>
+                        <label for="item-username" class="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-2">Username</label>
+                        <input type="text" id="item-username" class="bg-gray-50 border border-gray-300 text-gray-900 text-sm rounded-lg focus:ring-indigo-500 focus:border-indigo-500 block w-full p-2.5 dark:bg-gray-700 dark:border-gray-600 dark:placeholder-gray-400 dark:text-white" placeholder="Enter username">
+                    </div>
+                    <div>
+                        <label for="item-password" class="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-2">Password</label>
+                        <input type="password" id="item-password" class="bg-gray-50 border border-gray-300 text-gray-900 text-sm rounded-lg focus:ring-indigo-500 focus:border-indigo-500 block w-full p-2.5 dark:bg-gray-700 dark:border-gray-600 dark:placeholder-gray-400 dark:text-white" placeholder="Enter password">
+                    </div>
+                    <div>
+                        <label for="item-url" class="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-2">Website URL</label>
+                        <input type="url" id="item-url" class="bg-gray-50 border border-gray-300 text-gray-900 text-sm rounded-lg focus:ring-indigo-500 focus:border-indigo-500 block w-full p-2.5 dark:bg-gray-700 dark:border-gray-600 dark:placeholder-gray-400 dark:text-white" placeholder="https://">
+                    </div>
+                </div>
+                
+                <div id="document-fields" class="hidden space-y-4">
+                    <div>
+                        <label for="item-file" class="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-2">Upload File</label>
+                        <div class="flex items-center justify-center w-full">
+                            <label for="item-file" class="flex flex-col items-center justify-center w-full h-32 border-2 border-gray-300 border-dashed rounded-lg cursor-pointer bg-gray-50 dark:hover:bg-gray-700 dark:bg-gray-700 hover:bg-gray-100 dark:hover:bg-gray-600 dark:border-gray-600">
+                                <div class="flex flex-col items-center justify-center pt-5 pb-6">
+                                    <svg class="w-8 h-8 mb-4 text-gray-500 dark:text-gray-400" aria-hidden="true" xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 20 16">
+                                        <path stroke="currentColor" stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M13 13h3a3 3 0 0 0 0-6h-.025A5.56 5.56 0 0 0 16 6.5 5.5 5.5 0 0 0 5.207 5.021C5.136 5.017 5.068 5 5 5a4 4 0 0 0 0 8h2.167M10 15V6m0 0L8 8m2-2 2 2"/>
+                                    </svg>
+                                    <p class="mb-2 text-sm text-gray-500 dark:text-gray-400"><span class="font-semibold">Click to upload</span> or drag and drop</p>
+                                    <p class="text-xs text-gray-500 dark:text-gray-400">PDF, DOCX, XLSX, PPTX</p>
+                                </div>
+                                <input id="item-file" type="file" class="hidden" />
+                            </label>
+                        </div> 
+                    </div>
+                    <div>
+                        <label for="item-description" class="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-2">Description</label>
+                        <textarea id="item-description" rows="3" class="bg-gray-50 border border-gray-300 text-gray-900 text-sm rounded-lg focus:ring-indigo-500 focus:border-indigo-500 block w-full p-2.5 dark:bg-gray-700 dark:border-gray-600 dark:placeholder-gray-400 dark:text-white" placeholder="Description of the document"></textarea>
+                    </div>
+                </div>
+                
+                <div id="note-fields" class="hidden">
+                    <div>
+                        <label for="item-content" class="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-2">Content</label>
+                        <textarea id="item-content" rows="4" class="bg-gray-50 border border-gray-300 text-gray-900 text-sm rounded-lg focus:ring-indigo-500 focus:border-indigo-500 block w-full p-2.5 dark:bg-gray-700 dark:border-gray-600 dark:placeholder-gray-400 dark:text-white" placeholder="Write your note here..."></textarea>
+                    </div>
+                </div>
+                
+                <div id="link-fields" class="hidden">
+                    <div>
+                        <label for="item-link" class="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-2">URL</label>
+                        <input type="url" id="item-link" class="bg-gray-50 border border-gray-300 text-gray-900 text-sm rounded-lg focus:ring-indigo-500 focus:border-indigo-500 block w-full p-2.5 dark:bg-gray-700 dark:border-gray-600 dark:placeholder-gray-400 dark:text-white" placeholder="https://">
+                    </div>
+                    <div class="mt-4">
+                        <label for="item-link-description" class="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-2">Description (optional)</label>
+                        <input type="text" id="item-link-description" class="bg-gray-50 border border-gray-300 text-gray-900 text-sm rounded-lg focus:ring-indigo-500 focus:border-indigo-500 block w-full p-2.5 dark:bg-gray-700 dark:border-gray-600 dark:placeholder-gray-400 dark:text-white" placeholder="Brief description">
+                    </div>
+                </div>
+                
+                <div class="flex justify-end space-x-3 mt-6">
+                    <button type="button" id="cancel-add-item" class="text-gray-600 dark:text-gray-300 hover:text-gray-800 dark:hover:text-white px-4 py-2 rounded-lg border border-gray-300 dark:border-gray-600 transition-colors">
+                        Cancel
+                    </button>
+                    <button type="submit" class="bg-indigo-600 hover:bg-indigo-700 text-white px-4 py-2 rounded-lg font-medium transition-colors neon-effect">
+                        Add Item
+                    </button>
+                </div>
+            </form>
+        </div>
+    </div>
+
+    <!-- View Vault Item Modal -->
+    <div id="view-item-modal" class="fixed inset-0 flex items-center justify-center z-50 backdrop-blur-sm hidden">
+        <div class="bg-white dark:bg-slate-800 rounded-xl p-6 w-full max-w-md mx-4 glassmorphism">
+            <div class="flex justify-between items-center mb-4">
+                <h3 id="item-modal-title" class="text-xl font-semibold text-gray-800 dark:text-white"></h3>
+                <button type="button" id="close-view-item" class="text-gray-400 hover:text-gray-800 dark:hover:text-white">
+                    <svg xmlns="http://www.w3.org/2000/svg" class="h-6 w-6" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                        <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M6 18L18 6M6 6l12 12" />
+                    </svg>
+                </button>
+            </div>
+            
+            <div id="item-modal-content" class="space-y-4">
+                <!-- Item content will be populated here -->
+            </div>
+            
+            <div class="flex justify-end mt-6">
+                <button type="button" id="delete-item-btn" class="text-red-600 dark:text-red-400 hover:text-red-800 dark:hover:text-red-300 px-4 py-2 rounded-lg border border-red-200 dark:border-red-800 transition-colors flex items-center">
+                    <svg xmlns="http://www.w3.org/2000/svg" class="h-5 w-5 mr-1" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                        <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M19 7l-.867 12.142A2 2 0 0116.138 21H7.862a2 2 0 01-1.995-1.858L5 7m5 4v6m4-6v6m1-10V4a1 1 0 00-1-1h-4a1 1 0 00-1 1v3M4 7h16" />
+                    </svg>
+                    Delete
+                </button>
+            </div>
+        </div>
+    </div>
+
+<!-- Admin Login Modal -->
+<div id="admin-login-modal" class="fixed inset-0 flex items-center justify-center z-50 backdrop-blur-md hidden">
+    <div class="bg-white dark:bg-slate-800 rounded-2xl p-8 max-w-md w-full mx-4 glassmorphism relative modal-content">
+        <div class="absolute -top-20 -right-20 w-40 h-40 bg-purple-500 rounded-full opacity-10"></div>
+        <div class="absolute -bottom-20 -left-20 w-40 h-40 bg-indigo-500 rounded-full opacity-10"></div>
+        <div class="text-center mb-6">
+            <div class="flex justify-center mb-4">
+                <div class="w-16 h-16 rounded-full bg-gradient-to-r from-indigo-500 to-purple-600 flex items-center justify-center neon-effect">
+                    <svg xmlns="http://www.w3.org/2000/svg" class="h-8 w-8 text-white" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                        <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 15v2m-6 4h12a2 2 0 002-2v-6a2 2 0 00-2-2H6a2 2 0 00-2 2v6a2 2 0 002 2zm10-10V7a4 4 0 00-8 0v4h8z" />
+                    </svg>
+                </div>
+            </div>
+            <h2 class="text-3xl font-bold text-gray-800 dark:text-white">Admin Access</h2>
+            <p class="text-gray-600 dark:text-gray-300 mt-2">Secure Administrative Portal</p>
+        </div>
+        <form id="admin-login-form" class="space-y-6">
+            <div>
+                <label class="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-2">Administrator Username</label>
+                <input type="text" id="admin-username" class="bg-gray-50 border border-gray-300 text-gray-900 text-sm rounded-lg focus:ring-indigo-500 focus:border-indigo-500 block w-full p-3 dark:bg-gray-700 dark:border-gray-600 dark:placeholder-gray-400 dark:text-white search-bar" placeholder="Enter admin username" required>
+            </div>
+            <div>
+                <label class="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-2">Administrator Password</label>
+                <input type="password" id="admin-password" class="bg-gray-50 border border-gray-300 text-gray-900 text-sm rounded-lg focus:ring-indigo-500 focus:border-indigo-500 block w-full p-3 dark:bg-gray-700 dark:border-gray-600 dark:placeholder-gray-400 dark:text-white search-bar" placeholder="Enter admin password" required>
+            </div>
+            <div class="flex justify-end space-x-3">
+                <button type="button" id="close-admin-login" class="px-5 py-2.5 rounded-lg bg-gray-200 dark:bg-gray-600 text-gray-700 dark:text-gray-200 hover:bg-gray-300 dark:hover:bg-gray-500 transition-colors font-medium">
+                    Cancel
+                </button>
+                <button type="submit" class="px-5 py-2.5 rounded-lg bg-gradient-to-r from-indigo-600 to-purple-600 text-white hover:from-indigo-700 hover:to-purple-700 transition-all duration-300 font-medium neon-effect">
+                    Access Admin Panel
+                </button>
+            </div>
+        </form>
+        <div id="admin-login-error" class="text-red-500 text-sm mt-4 hidden text-center">
+            <div class="flex items-center justify-center">
+                <svg xmlns="http://www.w3.org/2000/svg" class="h-5 w-5 mr-1" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                    <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 8v4m0 4h.01M21 12a9 9 0 11-18 0 9 9 0 0118 0z" />
+                </svg>
+                <span>Invalid admin credentials. Please try again.</span>
+            </div>
+        </div>
+    </div>
+</div>
+
+<!-- Add User Modal -->
+<div id="add-user-modal" class="fixed inset-0 flex items-center justify-center z-50 backdrop-blur-md hidden">
+    <div class="bg-white dark:bg-slate-800 rounded-2xl p-8 max-w-md w-full mx-4 glassmorphism relative overflow-hidden">
+        <div class="absolute -top-20 -right-20 w-40 h-40 bg-purple-500 rounded-full opacity-10"></div>
+        <div class="absolute -bottom-20 -left-20 w-40 h-40 bg-indigo-500 rounded-full opacity-10"></div>
+
+        <div class="text-center mb-6">
+            <div class="flex justify-center mb-4">
+                <div class="w-16 h-16 rounded-full bg-gradient-to-r from-indigo-500 to-purple-600 flex items-center justify-center neon-effect">
+                    <svg xmlns="http://www.w3.org/2000/svg" class="h-8 w-8 text-white" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                        <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 6v6m0 0v6m0-6h6m-6 0H6" />
+                    </svg>
+                </div>
+            </div>
+            <h2 class="text-3xl font-bold text-gray-800 dark:text-white">Add New User</h2>
+            <p class="text-gray-600 dark:text-gray-300 mt-2">Create a new user account</p>
+        </div>
+
+        <form id="add-user-form" class="space-y-6">
+            <div>
+                <label for="new-username" class="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-2">Username *</label>
+                <input type="text" id="new-username" class="bg-gray-50 border border-gray-300 text-gray-900 text-sm rounded-lg focus:ring-indigo-500 focus:border-indigo-500 block w-full p-3 dark:bg-gray-700 dark:border-gray-600 dark:placeholder-gray-400 dark:text-white search-bar" placeholder="Enter username (min 3 characters)" required>
+                <p class="text-xs text-gray-500 dark:text-gray-400 mt-1">Username must be at least 3 characters long</p>
+            </div>
+
+            <div>
+                <label for="new-password" class="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-2">Password *</label>
+                <input type="password" id="new-password" class="bg-gray-50 border border-gray-300 text-gray-900 text-sm rounded-lg focus:ring-indigo-500 focus:border-indigo-500 block w-full p-3 dark:bg-gray-700 dark:border-gray-600 dark:placeholder-gray-400 dark:text-white search-bar" placeholder="Enter password (min 6 characters)" required>
+                <p class="text-xs text-gray-500 dark:text-gray-400 mt-1">Password must be at least 6 characters long</p>
+            </div>
+
+            <div>
+                <label for="new-name" class="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-2">Full Name *</label>
+                <input type="text" id="new-name" class="bg-gray-50 border border-gray-300 text-gray-900 text-sm rounded-lg focus:ring-indigo-500 focus:border-indigo-500 block w-full p-3 dark:bg-gray-700 dark:border-gray-600 dark:placeholder-gray-400 dark:text-white search-bar" placeholder="Enter full name" required>
+            </div>
+
+            <div>
+                <label for="new-department" class="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-2">Department *</label>
+                <select id="new-department" class="bg-gray-50 border border-gray-300 text-gray-900 text-sm rounded-lg focus:ring-indigo-500 focus:border-indigo-500 block w-full p-3 dark:bg-gray-700 dark:border-gray-600 dark:placeholder-gray-400 dark:text-white search-bar" required>
+                    <option value="" disabled selected>Select department</option>
+                    <option value="ICT">ICT Department</option>
+                    <option value="Health">Health Department</option>
+                    <option value="Engineering">Engineering Department</option>
+                    <option value="Administration">Administration</option>
+                    <option value="Security">Security Department</option>
+                    <option value="Legal">Legal Department</option>
+                    <option value="Accounts">Accounts Department</option>
+                    <option value="Logistics">Logistics</option>
+                </select>
+            </div>
+
+            <div>
+                <label class="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-2">User Role</label>
+                <div class="flex items-center space-x-4">
+                    <div class="flex items-center">
+                        <input type="radio" id="role-user" name="user-role" value="false" class="hidden peer" checked>
+                        <label for="role-user" class="flex items-center justify-center p-2 border border-gray-300 rounded-lg cursor-pointer hover:bg-gray-100 peer-checked:border-indigo-500 peer-checked:bg-indigo-50 dark:border-gray-600 dark:hover:bg-gray-700 dark:peer-checked:bg-slate-700 dark:peer-checked:border-indigo-500">
+                            <svg xmlns="http://www.w3.org/2000/svg" class="h-5 w-5 mr-2" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M16 7a4 4 0 11-8 0 4 4 0 018 0zM12 14a7 7 0 00-7 7h14a7 7 0 00-7-7z" />
+                            </svg>
+                            User
+                        </label>
+                    </div>
+                    <div class="flex items-center">
+                        <input type="radio" id="role-admin" name="user-role" value="true" class="hidden peer">
+                        <label for="role-admin" class="flex items-center justify-center p-2 border border-gray-300 rounded-lg cursor-pointer hover:bg-gray-100 peer-checked:border-indigo-500 peer-checked:bg-indigo-50 dark:border-gray-600 dark:hover:bg-gray-700 dark:peer-checked:bg-slate-700 dark:peer-checked:border-indigo-500">
+                            <svg xmlns="http://www.w3.org/2000/svg" class="h-5 w-5 mr-2" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 12l2 2 4-4m5.618-4.016A11.955 11.955 0 0112 2.944a11.955 11.955 0 01-8.618 3.04A12.02 12.02 0 003 9c0 5.591 3.824 10.29 9 11.622 5.176-1.332 9-6.03 9-11.622 0-1.042-.133-2.052-.382-3.016z" />
+                            </svg>
+                            Admin
+                        </label>
+                    </div>
+                </div>
+            </div>
+
+            <div class="flex justify-end space-x-3">
+                <button type="button" id="cancel-add-user" class="px-5 py-2.5 rounded-lg bg-gray-200 dark:bg-gray-600 text-gray-700 dark:text-gray-200 hover:bg-gray-300 dark:hover:bg-gray-500 transition-colors font-medium">
+                    Cancel
+                </button>
+                <button type="submit" class="px-5 py-2.5 rounded-lg bg-gradient-to-r from-indigo-600 to-purple-600 text-white hover:from-indigo-700 hover:to-purple-700 transition-all duration-300 font-medium neon-effect">
+                    Create User
+                </button>
+            </div>
+        </form>
+
+        <div id="add-user-error" class="text-red-500 text-sm mt-4 hidden text-center">
+            <div class="flex items-center justify-center">
+                <svg xmlns="http://www.w3.org/2000/svg" class="h-5 w-5 mr-1" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                    <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 8v4m0 4h.01M21 12a9 9 0 11-18 0 9 9 0 0118 0z" />
+                </svg>
+                <span id="add-user-error-text"></span>
+            </div>
+        </div>
+
+        <div id="add-user-success" class="text-green-500 text-sm mt-4 hidden text-center">
+            <div class="flex items-center justify-center">
+                <svg xmlns="http://www.w3.org/2000/svg" class="h-5 w-5 mr-1" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                    <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 12l2 2 4-4m6 2a9 9 0 11-18 0 9 9 0 0118 0z" />
+                </svg>
+                <span>User created successfully!</span>
+            </div>
+        </div>
+    </div>
+</div>
+
+<!-- Admin Panel Modal -->
+<div id="admin-panel-modal" class="fixed inset-0 flex items-center justify-center z-50 backdrop-blur-md hidden">
+    <div class="bg-white dark:bg-slate-800 rounded-2xl p-6 max-w-6xl w-full mx-4 glassmorphism relative overflow-hidden modal-content">
+        <div class="absolute -top-40 -right-40 w-80 h-80 bg-purple-500 rounded-full opacity-5"></div>
+        <div class="absolute -bottom-40 -left-40 w-80 h-80 bg-indigo-500 rounded-full opacity-5"></div>
+        
+        <div class="relative z-10">
+            <div class="flex flex-col md:flex-row justify-between items-start md:items-center mb-6">
+                <div>
+                    <h2 class="text-3xl font-bold text-gray-800 dark:text-white flex items-center">
+                        <svg xmlns="http://www.w3.org/2000/svg" class="h-8 w-8 mr-3 text-indigo-600 dark:text-indigo-400" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 12l2 2 4-4m5.618-4.016A11.955 11.955 0 0112 2.944a11.955 11.955 0 01-8.618 3.04A12.02 12.02 0 003 9c0 5.591 3.824 10.29 9 11.622 5.176-1.332 9-6.03 9-11.622 0-1.042-.133-2.052-.382-3.016z" />
+                        </svg>
+                        Administrative Dashboard
+                    </h2>
+                    <p class="text-gray-600 dark:text-gray-300 mt-1">Manage all help desk requests and user tickets</p>
+                </div>
+                <button id="close-admin-panel" class="absolute top-4 right-4 text-gray-400 hover:text-gray-800 dark:hover:text-white p-2 rounded-full hover:bg-gray-100 dark:hover:bg-gray-700 transition-colors z-20">
+                    <svg xmlns="http://www.w3.org/2000/svg" class="h-6 w-6" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                        <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M6 18L18 6M6 6l12 12" />
+                    </svg>
+                </button>
+            </div>
+            
+            <!-- Admin Dashboard Stats -->
+            <div class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-4 mb-6">
+                <div class="bg-gradient-to-r from-indigo-500 to-purple-600 rounded-xl p-5 text-white neon-effect shadow-lg transform transition-transform hover:scale-105">
+                    <div class="flex justify-between items-center">
+                        <div>
+                            <p class="text-sm opacity-90 font-medium">Total Tickets</p>
+                            <p class="text-3xl font-bold mt-1" id="total-tickets-count">0</p>
+                        </div>
+                        <div class="bg-white bg-opacity-20 p-3 rounded-full">
+                            <svg xmlns="http://www.w3.org/2000/svg" class="h-8 w-8" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M19 21V5a2 2 0 00-2-2H7a2 2 0 00-2 2v16m14 0h2m-2 0h-5m-9 0H3m2 0h5M9 7h1m-1 4h1m4-4h1m-1 4h1m-5 10v-5a1 1 0 011-1h2a1 1 0 011 1v5m-4 0h4" />
+                            </svg>
+                        </div>
+                    </div>
+                    <div class="mt-3">
+                        <div class="flex items-center text-sm opacity-80">
+                            <span>Increase from last month</span>
+                            <svg xmlns="http://www.w3.org/2000/svg" class="h-4 w-4 ml-1" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M5 10l7-7m0 0l7 7m-7-7v18" />
+                            </svg>
+                        </div>
+                    </div>
+                </div>
+                
+                <div class="bg-gradient-to-r from-blue-500 to-cyan-600 rounded-xl p-5 text-white neon-effect shadow-lg transform transition-transform hover:scale-105">
+                    <div class="flex justify-between items-center">
+                        <div>
+                            <p class="text-sm opacity-90 font-medium">Open Tickets</p>
+                            <p class="text-3xl font-bold mt-1" id="open-tickets-count">0</p>
+                        </div>
+                        <div class="bg-white bg-opacity-20 p-3 rounded-full">
+                            <svg xmlns="http://www.w3.org/2000/svg" class="h-8 w-8" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M8 10h.01M12 10h.01M16 10h.01M9 16H5a2 2 0 01-2-2V6a2 2 0 012-2h14a2 2 0 012 2v8a2 2 0 01-2 2h-5l-5 5v-5z" />
+                            </svg>
+                        </div>
+                    </div>
+                    <div class="mt-3">
+                        <div class="flex items-center text-sm opacity-80">
+                            <span>Requires immediate attention</span>
+                        </div>
+                    </div>
+                </div>
+                
+                <div class="bg-gradient-to-r from-green-500 to-emerald-600 rounded-xl p-5 text-white neon-effect shadow-lg transform transition-transform hover:scale-105">
+                    <div class="flex justify-between items-center">
+                        <div>
+                            <p class="text-sm opacity-90 font-medium">Resolved Tickets</p>
+                            <p class="text-3xl font-bold mt-1" id="resolved-tickets-count">0</p>
+                        </div>
+                        <div class="bg-white bg-opacity-20 p-3 rounded-full">
+                            <svg xmlns="http://www.w3.org/2000/svg" class="h-8 w-8" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 12l2 2 4-4m6 2a9 9 0 11-18 0 9 9 0 0118 0z" />
+                            </svg>
+                        </div>
+                    </div>
+                    <div class="mt-3">
+                        <div class="flex items-center text-sm opacity-80">
+                            <span>Successfully closed</span>
+                        </div>
+                    </div>
+                </div>
+                
+                <div class="bg-gradient-to-r from-amber-500 to-orange-600 rounded-xl p-5 text-white neon-effect shadow-lg transform transition-transform hover:scale-105">
+                    <div class="flex justify-between items-center">
+                        <div>
+                            <p class="text-sm opacity-90 font-medium">Processing</p>
+                            <p class="text-3xl font-bold mt-1" id="processing-tickets-count">0</p>
+                        </div>
+                        <div class="bg-white bg-opacity-20 p-3 rounded-full">
+                            <svg xmlns="http://www.w3.org/2000/svg" class="h-8 w-8" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 8v4l3 3m6-3a9 9 0 11-18 0 9 9 0 0118 0z" />
+                            </svg>
+                        </div>
+                    </div>
+                    <div class="mt-3">
+                        <div class="flex items-center text-sm opacity-80">
+                            <span>Currently in progress</span>
+                        </div>
+                    </div>
+                </div>
+            </div>
+            
+            <!-- Admin Controls -->
+            <div class="flex flex-col md:flex-row justify-between items-start md:items-center mb-6 gap-4 bg-gray-50 dark:bg-slate-700 p-4 rounded-xl">
+                <div class="flex flex-wrap gap-3">
+                    <div class="relative">
+                        <input type="text" id="admin-ticket-search" placeholder="Search tickets..." class="pl-10 pr-4 py-2.5 bg-white dark:bg-slate-800 border border-gray-300 dark:border-gray-600 rounded-lg text-sm focus:ring-2 focus:ring-indigo-500 focus:border-indigo-500 w-64 search-bar shadow-sm">
+                        <svg xmlns="http://www.w3.org/2000/svg" class="h-5 w-5 text-gray-400 absolute left-3 top-3" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M21 21l-6-6m2-5a7 7 0 11-14 0 7 7 0 0114 0z" />
+                        </svg>
+                    </div>
+
+                    <select id="admin-status-filter" class="bg-white dark:bg-slate-800 border border-gray-300 dark:border-gray-600 rounded-lg text-sm focus:ring-2 focus:ring-indigo-500 focus:border-indigo-500 py-2.5 px-4 search-bar shadow-sm">
+                        <option value="all">All Statuses</option>
+                        <option value="open">Open</option>
+                        <option value="processing">Processing</option>
+                        <option value="resolved">Resolved</option>
+                    </select>
+
+                    <select id="admin-priority-filter" class="bg-white dark:bg-slate-800 border border-gray-300 dark:border-gray-600 rounded-lg text-sm focus:ring-2 focus:ring-indigo-500 focus:border-indigo-500 py-2.5 px-4 search-bar shadow-sm">
+                        <option value="all">All Priorities</option>
+                        <option value="low">Low</option>
+                        <option value="medium">Medium</option>
+                        <option value="high">High</option>
+                        <option value="urgent">Urgent</option>
+                    </select>
+                </div>
+
+                <div class="flex gap-2">
+                    <button id="admin-add-user-btn" class="flex items-center px-4 py-2.5 bg-purple-100 dark:bg-purple-900 text-purple-700 dark:text-purple-200 rounded-lg hover:bg-purple-200 dark:hover:bg-purple-800 transition-colors shadow-sm">
+                        <svg xmlns="http://www.w3.org/2000/svg" class="h-5 w-5 mr-1" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 6v6m0 0v6m0-6h6m-6 0H6" />
+                        </svg>
+                        Add User
+                    </button>
+                    <button id="admin-manage-users-btn" class="flex items-center px-4 py-2.5 bg-blue-100 dark:bg-blue-900 text-blue-700 dark:text-blue-200 rounded-lg hover:bg-blue-200 dark:hover:bg-blue-800 transition-colors shadow-sm">
+                        <svg xmlns="http://www.w3.org/2000/svg" class="h-5 w-5 mr-1" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 4.354a4 4 0 110 5.292M15 21H3v-1a6 6 0 0112 0v1zm0 0h6v-1a6 6 0 00-9-5.197m13.5-9a2.5 2.5 0 11-5 0 2.5 2.5 0 015 0z" />
+                        </svg>
+                        Manage Users
+                    </button>
+                    <button id="admin-refresh-btn" class="flex items-center px-4 py-2.5 bg-indigo-100 dark:bg-indigo-900 text-indigo-700 dark:text-indigo-200 rounded-lg hover:bg-indigo-200 dark:hover:bg-indigo-800 transition-colors shadow-sm">
+                        <svg xmlns="http://www.w3.org/2000/svg" class="h-5 w-5 mr-1" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M4 4v5h.582m15.356 2A8.001 8.001 0 004.582 9m0 0H9m11 11v-5h-.581m0 0a8.003 8.003 0 01-15.357-2m15.357 2H15" />
+                        </svg>
+                        Refresh
+                    </button>
+                    <button id="admin-export-btn" class="flex items-center px-4 py-2.5 bg-green-100 dark:bg-green-900 text-green-700 dark:text-green-200 rounded-lg hover:bg-green-200 dark:hover:bg-green-800 transition-colors shadow-sm">
+                        <svg xmlns="http://www.w3.org/2000/svg" class="h-5 w-5 mr-1" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 10v6m0 0l-3-3m3 3l3-3m2 8H7a2 2 0 01-2-2V5a2 2 0 012-2h5.586a1 1 0 01.707.293l5.414 5.414a1 1 0 01.293.707V19a2 2 0 01-2 2z" />
+                        </svg>
+                        Export
+                    </button>
+                </div>
+            </div>
+            
+            <!-- Admin Ticket List -->
+            <div id="admin-ticket-list" class="space-y-4 max-h-[50vh] overflow-y-auto pr-2 scrollbar-thin scrollbar-thumb-indigo-300 scrollbar-track-transparent rounded-lg">
+                <!-- All tickets from all users will be rendered here -->
+            </div>
+            
+            <!-- Admin Footer -->
+            <div class="mt-6 pt-4 border-t border-gray-200 dark:border-gray-700 flex flex-col md:flex-row justify-between items-center text-sm text-gray-500 dark:text-gray-400">
+                <div>
+                    <p>Last updated: <span id="last-updated-time">Just now</span></p>
+                </div>
+                <div class="mt-2 md:mt-0 flex items-center">
+                    <span class="mr-2">Quick Actions:</span>
+                    <button class="text-indigo-600 dark:text-indigo-400 hover:underline mr-3">Assign Tickets</button>
+                    <button class="text-indigo-600 dark:text-indigo-400 hover:underline">View Reports</button>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+
+    <script>
+        // Sample data for demo purposes
+        const users = {
+            cyrus: {
+                name: "Cyrus Aziliko",
+                dept: "ICT Department",
+                avatar: "cyrus.jpg",
+                welcomeMessage: "Hello, ICT Specialist!",
+                password: "cyrus123",
+                vaultItems: [
+                    { id: 1, name: "Admin Dashboard", type: "credential", username: "caziliko", password: "********", url: "https://admin.example.com" },
+                    { id: 2, name: "VPN Credentials", type: "credential", username: "cyrus_a", password: "********", url: "https://vpn.example.com" },
+                    { id: 3, name: "Server Documentation", type: "document", description: "Server configurations and access details", file: "server-docs.pdf" },
+                    { id: 4, name: "Important Notes", type: "note", content: "Remember to update firewall rules every Friday" }
+                ],
+                tickets: [
+                    { id: 1, subject: "VPN not connecting", description: "Unable to connect to the corporate VPN since yesterday", status: "resolved", date: "2023-05-15", priority: "high" },
+                    { id: 2, subject: "New laptop request", description: "Need a new laptop for the junior developer", status: "open", date: "2023-06-02", priority: "medium" }
+                ]
+            },
+            emmanuella: {
+                name: "Emmanuella Mensah",
+                dept: "Health Department",
+                avatar: "Ella.jpg",
+                welcomeMessage: "Welcome back, Nurse!",
+                password: "ella123",
+                vaultItems: [
+                    { id: 1, name: "Medical Portal", type: "credential", username: "emensah", password: "********", url: "https://medical.example.com" },
+                    { id: 2, name: "HIPAA Guidelines", type: "document", description: "Latest HIPAA compliance documentation", file: "hipaa-2023.pdf" },
+                    { id: 3, name: "Patient Notes", type: "note", content: "Important updates on patient cases for June" }
+                ],
+                tickets: [
+                    { id: 1, subject: "System downtime", description: "Electronic health records system was down for 30 minutes", status: "resolved", date: "2023-05-20", priority: "high" },
+                    { id: 2, subject: "Access request", description: "Need access to pediatric records system", status: "processing", date: "2023-06-01", priority: "medium" }
+                ]
+            },
+            Uriel: {
+                name: "Uriel Aziliko",
+                dept: "Engineering Department",
+                avatar: "zo.jpg",
+                welcomeMessage: "Hey Engineer, ready for today?",
+                password: "uriel123",
+                vaultItems: [
+                    { id: 1, name: "CAD Software", type: "credential", username: "Zowini", password: "********", url: "https://cad.example.com" },
+                    { id: 2, name: "Project Blueprints", type: "document", description: "Latest project blueprints for review", file: "blueprint-2023.zip" },
+                    { id: 3, name: "Meeting Notes", type: "note", content: "Action items from last engineering meeting" },
+                    { id: 4, name: "Supplier Portal", type: "credential", username: "engineer_12", password: "********", url: "https://suppliers.example.com" }
+                ],
+                tickets: [
+                    { id: 1, subject: "Printer issue", description: "Printer in engineering dept is jammed", status: "resolved", date: "2023-05-18", priority: "low" },
+                    { id: 2, subject: "Software license", description: "Need renewal for AutoCAD license", status: "processing", date: "2023-06-05", priority: "medium" }
+                ]
+            },
+            Zipporah: {
+                name: "Zipporah Aziliko",
+                dept: "Administration",
+                avatar: "zii.jpg",
+                welcomeMessage: "Good day, Administrator!",
+                password: "zipporah123",
+                vaultItems: [
+                    { id: 1, name: "Payroll System", type: "credential", username: "Suguri", password: "********", url: "https://payroll.example.com" },
+                    { id: 2, name: "HR Policies", type: "document", description: "Updated HR policies effective June 2023", file: "hr-policies-2023.pdf" },
+                    { id: 3, name: "Meeting Links", type: "link", url: "https://meet.example.com/annual-review", description: "Monthly leadership team meeting" }
+                ],
+                tickets: [
+                    { id: 1, subject: "Calendar sync issue", description: "Outlook calendar not syncing with phone", status: "resolved", date: "2023-05-22", priority: "medium" },
+                    { id: 2, subject: "Invoices", description: "Need help with invoice processing system", status: "open", date: "2023-06-03", priority: "high" }
+                ]
+            },
+            
+        cecilia: {
+            name: "Cecilia Tenkorang",
+            dept: "Legal Department",
+            avatar: "ceci.jpg",
+            welcomeMessage: "Greetings, Legal Counsel!",
+            password: "cecilia123",
+            vaultItems: [
+                { id: 1, name: "Case Management System", type: "credential", username: "cecilia_law", password: "********", url: "https://legal.example.com" },
+                { id: 2, name: "Legal Templates", type: "document", description: "Contracts and agreements", file: "legal-templates.zip" },
+                { id: 3, name: "Pending Reviews", type: "note", content: "Review supplier contract terms by Friday" }
+            ],
+            tickets: [
+                { id: 1, subject: "Access to archived contracts", description: "Need access to archived legal files from 2022", status: "open", date: "2023-06-20", priority: "medium" },
+                { id: 2, subject: "PDF editor license", description: "Requesting license for legal PDF editor", status: "processing", date: "2023-07-01", priority: "low" }
+            ]
+        },
+        akosua: {
+            name: "Akosua Brempomaa",
+            dept: "Accounts Department",
+            avatar: "akosua.jpg",
+            welcomeMessage: "Hello Akosua, time to balance the books!",
+            password: "akosua123",
+            vaultItems: [
+                     { id: 1, name: "Payroll Login", type: "credential", username: "akosua_acc", password: "********", url: "https://payroll.example.com" },
+                     { id: 2, name: "Monthly Reports", type: "document", description: "Accounts summary for Q2", file: "q2-reports.pdf" },
+                     { id: 3, name: "Tax Reminder", type: "note", content: "File tax forms before 25th of the month" }
+            ],
+            tickets: [
+                { id: 1, subject: "Error in payroll sheet", description: "Incorrect deductions showing for July", status: "open", date: "2023-07-10", priority: "high" }
+            ]
+        },
+        goldstreet: {
+            name: "Goldstreet Aziliko",
+            dept: "Logistics",
+            avatar: "golda.jpg",
+            welcomeMessage: "Welcome, Logistics Lead!",
+            password: "goldstreet123",
+            vaultItems: [
+                      { id: 1, name: "Warehouse Portal", type: "credential", username: "gstreet", password: "********", url: "https://logistics.example.com" },
+                      { id: 2, name: "Delivery Schedules", type: "document", description: "Routes and drop-offs for July", file: "schedule-july.pdf" },
+                      { id: 3, name: "Fleet Checklist", type: "note", content: "Inspect trucks weekly and update form" },
+                      { id: 4, name: "Tracking Link", type: "link", url: "https://track.example.com", description: "Real-time fleet tracker" }
+            ],
+            tickets: [
+                      { id: 1, subject: "Fuel card issue", description: "Card not working at partner station", status: "processing", date: "2023-07-12", priority: "medium" },
+                      { id: 2, subject: "Late deliveries", description: "Concern about delay due to software syncing", status: "open", date: "2023-07-13", priority: "high" }
+            ]
+        },
+        Peter: {
+                name: "Peter Aziliko",
+                dept: "Security Department",
+                avatar: "dad.jpg",
+                welcomeMessage: "Security matters! Stay vigilant.",
+                password: "peter123",
+                vaultItems: [
+                    { id: 1, name: "Surveillance System", type: "credential", username: "Peter", password: "********", url: "https://cctv.example.com" },
+                    { id: 2, name: "Incident Reports", type: "document", description: "Monthly security incident reports", file: "incidents-may-2023.pdf" },
+                    { id: 3, name: "Access Codes", type: "note", content: "Updated door access codes for June" }
+                ],
+                tickets: [
+                    { id: 1, subject: "Badge reader malfunction", description: "Badge reader at east entrance not working", status: "resolved", date: "2023-05-25", priority: "medium" },
+                    { id: 2, subject: "Camera offline", description: "Camera #12 in parking lot is offline", status: "open", date: "2023-06-04", priority: "high" }
+                ]
+            }
+        };
+
+        // Current user data
+        let currentUser = null;
+
+        // DOM Elements
+        const authModal = document.getElementById('auth-modal');
+        const appContent = document.getElementById('app-content');
+        const userSelect = document.getElementById('users');
+        const biometricAuthBtn = document.getElementById('biometric-auth');
+        const logoutBtn = document.getElementById('logout-btn');
+        const userDashboard = document.getElementById('user-dashboard');
+        const userName = document.getElementById('user-name');
+        const userDept = document.getElementById('user-dept');
+        const userAvatar = document.getElementById('user-avatar');
+        const welcomeMessage = document.getElementById('welcome-message');
+        const vaultSection = document.querySelector('#vault-section .grid');
+        const helpdeskSection = document.getElementById('helpdesk-section');
+        const ticketForm = document.getElementById('ticket-form');
+        const ticketList = document.getElementById('ticket-list');
+        const ticketSubject = document.getElementById('ticket-subject');
+        const ticketDescription = document.getElementById('ticket-description');
+        const toggleVaultBtn = document.getElementById('toggle-vault');
+        const toggleHelpdeskBtn = document.getElementById('toggle-helpdesk');
+        const addVaultItemBtn = document.getElementById('add-vault-item');
+        const themeToggleBtn = document.getElementById('theme-toggle');
+        const sunIcon = document.getElementById('sun-icon');
+        const moonIcon = document.getElementById('moon-icon');
+        const addItemModal = document.getElementById('add-item-modal');
+        const addItemForm = document.getElementById('add-item-form');
+        const cancelAddItemBtn = document.getElementById('cancel-add-item');
+        const itemTypes = document.querySelectorAll('input[name="item-type"]');
+        const credentialFields = document.getElementById('credential-fields');
+        const documentFields = document.getElementById('document-fields');
+        const noteFields = document.getElementById('note-fields');
+        const linkFields = document.getElementById('link-fields');
+        const viewItemModal = document.getElementById('view-item-modal');
+        const closeViewItemBtn = document.getElementById('close-view-item');
+        const deleteItemBtn = document.getElementById('delete-item-btn');
+        const itemModalTitle = document.getElementById('item-modal-title');
+        const itemModalContent = document.getElementById('item-modal-content');
+        const authIndicator = document.getElementById('auth-indicator');
+
+        // Admin Panel Elements
+const openAdminLoginBtn = document.getElementById('open-admin-login');
+const adminLoginModal = document.getElementById('admin-login-modal');
+const closeAdminLoginBtn = document.getElementById('close-admin-login');
+const adminLoginForm = document.getElementById('admin-login-form');
+const adminLoginError = document.getElementById('admin-login-error');
+const adminPanelModal = document.getElementById('admin-panel-modal');
+const closeAdminPanelBtn = document.getElementById('close-admin-panel');
+const adminTicketList = document.getElementById('admin-ticket-list');
+
+// Admin credentials (for demo)
+const ADMIN_USERNAME = "admin";
+const ADMIN_PASSWORD = "admin123";
+
+// Open admin login modal
+openAdminLoginBtn.addEventListener('click', () => {
+    adminLoginModal.classList.remove('hidden');
+    adminLoginError.classList.add('hidden');
+    adminLoginForm.reset();
+});
+
+// Close admin login modal
+closeAdminLoginBtn.addEventListener('click', () => {
+    adminLoginModal.classList.add('hidden');
+    adminLoginError.classList.add('hidden');
+});
+
+// Handle admin login
+adminLoginForm.addEventListener('submit', function(e) {
+    e.preventDefault();
+    const username = document.getElementById('admin-username').value;
+    const password = document.getElementById('admin-password').value;
+    if (username === ADMIN_USERNAME && password === ADMIN_PASSWORD) {
+        adminLoginModal.classList.add('hidden');
+        renderAdminTickets();
+        adminPanelModal.classList.remove('hidden');
+    } else {
+        adminLoginError.textContent = "Invalid admin credentials.";
+        adminLoginError.classList.remove('hidden');
+    }
+});
+
+// Close admin panel modal
+closeAdminPanelBtn.addEventListener('click', () => {
+    adminPanelModal.classList.add('hidden');
+});
+
+        // Render all tickets from all users with enhanced styling
+        function renderAdminTickets(filterStatus = 'all', filterPriority = 'all', searchTerm = '') {
+            adminTicketList.innerHTML = '';
+            let found = false;
+            let totalTickets = 0;
+            let openTickets = 0;
+            let resolvedTickets = 0;
+            let processingTickets = 0;
+            
+            Object.keys(users).forEach(username => {
+                const user = users[username];
+                user.tickets.forEach(ticket => {
+                    // Apply filters
+                    const matchesStatus = filterStatus === 'all' || ticket.status === filterStatus;
+                    const matchesPriority = filterPriority === 'all' || ticket.priority === filterPriority;
+                    const matchesSearch = searchTerm === '' || 
+                        ticket.subject.toLowerCase().includes(searchTerm.toLowerCase()) ||
+                        ticket.description.toLowerCase().includes(searchTerm.toLowerCase()) ||
+                        user.name.toLowerCase().includes(searchTerm.toLowerCase());
+                    
+                    if (matchesStatus && matchesPriority && matchesSearch) {
+                        found = true;
+                        totalTickets++;
+                        if (ticket.status === 'open') openTickets++;
+                        else if (ticket.status === 'resolved') resolvedTickets++;
+                        else if (ticket.status === 'processing') processingTickets++;
+                        
+                        const ticketElement = document.createElement('div');
+                        ticketElement.className = 'bg-white dark:bg-slate-800 rounded-xl shadow-sm p-5 vault-item glassmorphism hover:shadow-md transition-all duration-300';
+                        
+                        // Determine status class
+                        let statusClass = '';
+                        if (ticket.status === 'resolved') statusClass = 'bg-green-100 dark:bg-green-900 text-green-800 dark:text-green-200';
+                        else if (ticket.status === 'processing') statusClass = 'bg-yellow-100 dark:bg-yellow-900 text-yellow-800 dark:text-yellow-200';
+                        else statusClass = 'bg-blue-100 dark:bg-blue-900 text-blue-800 dark:text-blue-200';
+                        
+                        // Determine priority class
+                        let priorityClass = '';
+                        if (ticket.priority === 'low') priorityClass = 'bg-gray-100 dark:bg-gray-700 text-gray-800 dark:text-gray-200';
+                        else if (ticket.priority === 'medium') priorityClass = 'bg-blue-100 dark:bg-blue-900 text-blue-800 dark:text-blue-200';
+                        else if (ticket.priority === 'high') priorityClass = 'bg-orange-100 dark:bg-orange-900 text-orange-800 dark:text-orange-200';
+                        else if (ticket.priority === 'urgent') priorityClass = 'bg-red-100 dark:bg-red-900 text-red-800 dark:text-red-200';
+                        
+                        ticketElement.innerHTML = `
+                            <div class="flex flex-col md:flex-row md:items-center justify-between gap-4">
+                                <div class="flex-1">
+                                    <div class="flex flex-col md:flex-row md:items-center justify-between gap-2">
+                                        <h3 class="font-semibold text-lg text-gray-800 dark:text-white">${ticket.subject}</h3>
+                                        <div class="flex gap-2">
+                                            <span class="text-xs px-2.5 py-1 rounded-full ${statusClass} font-medium">
+                                                ${ticket.status.charAt(0).toUpperCase() + ticket.status.slice(1)}
+                                            </span>
+                                            <span class="text-xs px-2.5 py-1 rounded-full ${priorityClass} font-medium">
+                                                ${ticket.priority.charAt(0).toUpperCase() + ticket.priority.slice(1)}
+                                            </span>
+                                        </div>
+                                    </div>
+                                    <p class="text-gray-600 dark:text-gray-300 mt-2">${ticket.description}</p>
+                                    <div class="flex flex-wrap items-center gap-4 mt-3 text-sm">
+                                        <div class="flex items-center text-gray-500 dark:text-gray-400">
+                                            <svg xmlns="http://www.w3.org/2000/svg" class="h-4 w-4 mr-1" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                                                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M16 7a4 4 0 11-8 0 4 4 0 018 0zM12 14a7 7 0 00-7 7h14a7 7 0 00-7-7z" />
+                                            </svg>
+                                            <span>${user.name}</span>
+                                        </div>
+                                        <div class="flex items-center text-gray-500 dark:text-gray-400">
+                                            <svg xmlns="http://www.w3.org/2000/svg" class="h-4 w-4 mr-1" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                                                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M21 13.255A23.931 23.931 0 0112 15c-3.183 0-6.22-.62-9-1.745M16 6V4a2 2 0 00-2-2h-4a2 2 0 00-2 2v2m4 6h.01M5 20h14a2 2 0 002-2V8a2 2 0 00-2-2H5a2 2 0 00-2 2v10a2 2 0 002 2z" />
+                                            </svg>
+                                            <span>${user.dept}</span>
+                                        </div>
+                                        <div class="flex items-center text-gray-500 dark:text-gray-400">
+                                            <svg xmlns="http://www.w3.org/2000/svg" class="h-4 w-4 mr-1" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                                                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M8 7V3m8 4V3m-9 8h10M5 21h14a2 2 0 002-2V7a2 2 0 00-2-2H5a2 2 0 00-2 2v12a2 2 0 002 2z" />
+                                            </svg>
+                                            <span>${ticket.date}</span>
+                                        </div>
+                                    </div>
+                                </div>
+                                <div class="flex flex-col items-end gap-2">
+                                    <select class="admin-status-select bg-gray-100 dark:bg-slate-700 border border-gray-300 dark:border-gray-600 rounded-lg text-sm focus:ring-indigo-500 focus:border-indigo-500 px-3 py-2 w-32 search-bar" data-user="${username}" data-id="${ticket.id}">
+                                        <option value="open" ${ticket.status === 'open' ? 'selected' : ''}>Open</option>
+                                        <option value="processing" ${ticket.status === 'processing' ? 'selected' : ''}>Processing</option>
+                                        <option value="resolved" ${ticket.status === 'resolved' ? 'selected' : ''}>Resolved</option>
+                                    </select>
+                                    <button class="admin-view-ticket bg-indigo-100 dark:bg-indigo-900 text-indigo-700 dark:text-indigo-200 px-3 py-2 rounded-lg text-sm hover:bg-indigo-200 dark:hover:bg-indigo-800 transition-colors" data-user="${username}" data-id="${ticket.id}">
+                                        View Details
+                                    </button>
+                                </div>
+                            </div>
+                        `;
+                        adminTicketList.appendChild(ticketElement);
+                    }
+                });
+            });
+            
+            if (!found) {
+                adminTicketList.innerHTML = `
+                    <div class="text-center py-12">
+                        <svg xmlns="http://www.w3.org/2000/svg" class="h-16 w-16 mx-auto text-gray-300 dark:text-gray-600 mb-4" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9.172 16.172a4 4 0 015.656 0M9 10h.01M15 10h.01M21 12a9 9 0 11-18 0 9 9 0 0118 0z" />
+                        </svg>
+                        <h3 class="text-lg font-medium text-gray-800 dark:text-white mb-2">No tickets found</h3>
+                        <p class="text-gray-600 dark:text-gray-400">Try adjusting your search or filter criteria</p>
+                    </div>
+                `;
+            }
+
+            // Add event listeners for status change
+            document.querySelectorAll('.admin-status-select').forEach(select => {
+                select.addEventListener('change', function() {
+                    const username = this.dataset.user;
+                    const ticketId = parseInt(this.dataset.id);
+                    const newStatus = this.value;
+                    const user = users[username];
+                    const ticket = user.tickets.find(t => t.id === ticketId);
+                    if (ticket) {
+                        ticket.status = newStatus;
+                        renderAdminTickets(filterStatus, filterPriority, searchTerm);
+                        if (currentUser && currentUser.name === user.name) renderTickets();
+                        showNotification('Ticket status updated');
+                    }
+                });
+            });
+            
+            // Add event listeners for view ticket buttons
+            document.querySelectorAll('.admin-view-ticket').forEach(button => {
+                button.addEventListener('click', function() {
+                    const username = this.dataset.user;
+                    const ticketId = parseInt(this.dataset.id);
+                    const user = users[username];
+                    const ticket = user.tickets.find(t => t.id === ticketId);
+                    if (ticket) {
+                        // Show ticket details in a notification or modal
+                        showNotification(`Ticket from ${user.name}: ${ticket.subject} - ${ticket.description}`);
+                    }
+                });
+            });
+            
+            // Update stats
+            updateAdminStats(totalTickets, openTickets, resolvedTickets, processingTickets);
+        }
+        
+        // Update admin dashboard stats
+        function updateAdminStats(total = 0, open = 0, resolved = 0, processing = 0) {
+            // If no parameters provided, calculate totals
+            if (total === 0 && open === 0 && resolved === 0 && processing === 0) {
+                Object.keys(users).forEach(username => {
+                    const user = users[username];
+                    user.tickets.forEach(ticket => {
+                        total++;
+                        if (ticket.status === 'open') open++;
+                        else if (ticket.status === 'resolved') resolved++;
+                        else if (ticket.status === 'processing') processing++;
+                    });
+                });
+            }
+            
+            // Update the stats display
+            document.getElementById('total-tickets-count').textContent = total;
+            document.getElementById('open-tickets-count').textContent = open;
+            document.getElementById('resolved-tickets-count').textContent = resolved;
+            document.getElementById('processing-tickets-count').textContent = processing;
+        }
+        // Event Listeners
+        biometricAuthBtn.addEventListener('click', authenticateUser);
+        userSelect.addEventListener('change', selectUser);
+        logoutBtn.addEventListener('click', logout);
+        ticketForm.addEventListener('submit', submitTicket);
+        toggleVaultBtn.addEventListener('click', () => toggleSection('vault'));
+        toggleHelpdeskBtn.addEventListener('click', () => toggleSection('helpdesk'));
+        addVaultItemBtn.addEventListener('click', () => addItemModal.classList.remove('hidden'));
+        themeToggleBtn.addEventListener('click', toggleTheme);
+        cancelAddItemBtn.addEventListener('click', () => addItemModal.classList.add('hidden'));
+        closeViewItemBtn.addEventListener('click', () => viewItemModal.classList.add('hidden'));
+        deleteItemBtn.addEventListener('click', deleteItem);
+
+        // Handle item type selection changes
+        itemTypes.forEach(type => {
+            type.addEventListener('change', function() {
+                credentialFields.classList.add('hidden');
+                documentFields.classList.add('hidden');
+                noteFields.classList.add('hidden');
+                linkFields.classList.add('hidden');
+                
+                if (this.value === 'credential') {
+                    credentialFields.classList.remove('hidden');
+                } else if (this.value === 'document') {
+                    documentFields.classList.remove('hidden');
+                } else if (this.value === 'note') {
+                    noteFields.classList.remove('hidden');
+                } else if (this.value === 'link') {
+                    linkFields.classList.remove('hidden');
+                }
+            });
+        });
+
+        // Form submission for adding new vault item
+        addItemForm.addEventListener('submit', function(e) {
+            e.preventDefault();
+            
+            const itemName = document.getElementById('item-name').value;
+            const itemType = document.querySelector('input[name="item-type"]:checked').value;
+            let newItem = { id: Date.now(), name: itemName, type: itemType };
+            
+            if (itemType === 'credential') {
+                newItem.username = document.getElementById('item-username').value;
+                newItem.password = document.getElementById('item-password').value;
+                newItem.url = document.getElementById('item-url').value;
+            } else if (itemType === 'document') {
+                newItem.description = document.getElementById('item-description').value;
+                newItem.file = document.getElementById('item-file').files[0] ? document.getElementById('item-file').files[0].name : 'uploaded_file.pdf';
+            } else if (itemType === 'note') {
+                newItem.content = document.getElementById('item-content').value;
+            } else if (itemType === 'link') {
+                newItem.url = document.getElementById('item-link').value;
+                newItem.description = document.getElementById('item-link-description').value;
+            }
+            
+            currentUser.vaultItems.push(newItem);
+            renderVaultItems();
+            addItemModal.classList.add('hidden');
+            addItemForm.reset();
+        });
+
+        function renderAccountInfo() {
+            const passwordSpan = document.getElementById('user-login-password');
+            const copyBtn = document.getElementById('copy-password-btn');
+
+            if (passwordSpan) {
+                passwordSpan.textContent = currentUser.password;
+            }
+
+            if (copyBtn) {
+                copyBtn.onclick = () => { // Use onclick to avoid attaching multiple listeners
+                    navigator.clipboard.writeText(currentUser.password);
+                    showNotification('Password copied to clipboard');
+                };
+            }
+        }
+
+        // Functions
+        function authenticateUser() {
+            const selectedUser = userSelect.value;
+            if (!selectedUser) {
+                alert('Please select a user first');
+                return;
+            }
+
+            // Open biometric authentication popup window
+            const user = users[selectedUser];
+            const popup = window.open('biometric-popup.html', 'Biometric Authentication', 'width=400,height=500');
+
+            // Pass selected user info to popup via window property
+            popup.selectedUser = user;
+
+            // Listen for messages from popup
+            window.addEventListener('message', function onMessage(event) {
+                if (event.source !== popup) return;
+
+                if (event.data.type === 'biometric-success') {
+                    // Close popup
+                    popup.close();
+                    window.removeEventListener('message', onMessage);
+
+                    // Set current user data
+                    currentUser = event.data.user;
+
+                    // Update UI with user data
+                    userName.textContent = currentUser.name;
+                    userDept.textContent = currentUser.dept;
+                    userAvatar.src = currentUser.avatar;
+                    userAvatar.alt = `Profile photo of ${currentUser.name}`;
+                    welcomeMessage.textContent = currentUser.welcomeMessage;
+
+                    // Hide auth modal and show app content
+                    authModal.classList.add('hidden');
+                    appContent.classList.remove('hidden');
+
+                    // Render vault items and tickets
+                    renderVaultItems();
+                    renderTickets();
+                    renderAccountInfo();
+
+                    // Show welcome notification
+                    showNotification(`Welcome, ${currentUser.name}!`);
+
+                    // Set user-specific avatar alt text
+                    userAvatar.alt = `Profile of ${currentUser.name}, ${currentUser.dept}`;
+                } else if (event.data.type === 'biometric-cancel') {
+                    // Close popup
+                    popup.close();
+                    window.removeEventListener('message', onMessage);
+
+                    // Reset auth indicator or show cancellation message if needed
+                    showNotification('Biometric authentication cancelled');
+                }
+            });
+        }
+
+        function selectUser() {
+            const selectedUser = userSelect.value;
+            if (selectedUser) {
+                biometricAuthBtn.disabled = false;
+                biometricAuthBtn.classList.remove('opacity-50');
+                
+                // Update avatar preview
+                const avatarPreview = document.querySelector('.floating img');
+                avatarPreview.src = users[selectedUser].avatar;
+                avatarPreview.alt = `Profile photo preview for ${users[selectedUser].name}`;
+            } else {
+                biometricAuthBtn.disabled = true;
+                biometricAuthBtn.classList.add('opacity-50');
+            }
+        }
+
+        function logout() {
+            currentUser = null;
+            appContent.classList.add('hidden');
+            authModal.classList.remove('hidden');
+            helpdeskSection.classList.add('hidden');
+            addItemModal.classList.add('hidden');
+            viewItemModal.classList.add('hidden');
+            
+            // Clear form
+            ticketForm.reset();
+            addItemForm.reset();
+            
+            // Reset user select
+            userSelect.value = '';
+            
+            showNotification('You have been logged out securely');
+        }
+
+        function toggleSection(section) {
+            if (section === 'vault') {
+                helpdeskSection.classList.add('hidden');
+                toggleHelpdeskBtn.classList.remove('bg-purple-700', 'dark:bg-purple-800');
+                toggleHelpdeskBtn.classList.add('bg-purple-600', 'dark:bg-purple-600');
+                
+                toggleVaultBtn.classList.remove('bg-indigo-600', 'dark:bg-indigo-600');
+                toggleVaultBtn.classList.add('bg-indigo-700', 'dark:bg-indigo-800');
+            } else if (section === 'helpdesk') {
+                helpdeskSection.classList.remove('hidden');
+                toggleVaultBtn.classList.remove('bg-indigo-700', 'dark:bg-indigo-800');
+                toggleVaultBtn.classList.add('bg-indigo-600', 'dark:bg-indigo-600');
+                
+                toggleHelpdeskBtn.classList.remove('bg-purple-600', 'dark:bg-purple-600');
+                toggleHelpdeskBtn.classList.add('bg-purple-700', 'dark:bg-purple-800');
+            }
+        }
+
+        function toggleTheme() {
+            document.documentElement.classList.toggle('dark');
+            
+            if (document.documentElement.classList.contains('dark')) {
+                sunIcon.classList.add('hidden');
+                moonIcon.classList.remove('hidden');
+                localStorage.setItem('theme', 'dark');
+            } else {
+                moonIcon.classList.add('hidden');
+                sunIcon.classList.remove('hidden');
+                localStorage.setItem('theme', 'light');
+            }
+        }
+
+        function renderVaultItems() {
+            vaultSection.innerHTML = '';
+            
+            currentUser.vaultItems.forEach(item => {
+                const itemElement = document.createElement('div');
+                itemElement.className = 'vault-item bg-white dark:bg-slate-800 rounded-xl p-4 shadow-sm hover:shadow-md transition-shadow';
+                itemElement.dataset.id = item.id;
+                
+                let icon, content;
+                
+                if (item.type === 'credential') {
+                    icon = `<div class="w-10 h-10 rounded-lg bg-indigo-100 dark:bg-indigo-900 flex items-center justify-center text-indigo-600 dark:text-indigo-300 mb-3">
+                                <svg xmlns="http://www.w3.org/2000/svg" class="h-6 w-6" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                                    <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 15v2m-6 4h12a2 2 0 002-2v-6a2 2 0 00-2-2H6a2 2 0 00-2 2v6a2 2 0 002 2zm10-10V7a4 4 0 00-8 0v4h8z" />
+                                </svg>
+                            </div>`;
+                    content = `<h3 class="font-medium text-gray-800 dark:text-white">${item.name}</h3>
+                              <p class="text-sm text-gray-500 dark:text-gray-400 mt-1">${item.username}</p>
+                              <p class="text-xs text-indigo-500 dark:text-indigo-400 mt-2 truncate">${item.url}</p>`;
+                } else if (item.type === 'document') {
+                    icon = `<div class="w-10 h-10 rounded-lg bg-purple-100 dark:bg-purple-900 flex items-center justify-center text-purple-600 dark:text-purple-300 mb-3">
+                                <svg xmlns="http://www.w3.org/2000/svg" class="h-6 w-6" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                                    <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 12h6m-6 4h6m2 5H7a2 2 0 01-2-2V5a2 2 0 012-2h5.586a1 1 0 01.707.293l5.414 5.414a1 1 0 01.293.707V19a2 2 0 01-2 2z" />
+                                </svg>
+                            </div>`;
+                    content = `<h3 class="font-medium text-gray-800 dark:text-white">${item.name}</h3>
+                              <p class="text-sm text-gray-500 dark:text-gray-400 mt-1">${item.file}</p>
+                              <p class="text-xs text-purple-500 dark:text-purple-400 mt-2 truncate">${item.description}</p>`;
+                } else if (item.type === 'note') {
+                    icon = `<div class="w-10 h-10 rounded-lg bg-green-100 dark:bg-green-900 flex items-center justify-center text-green-600 dark:text-green-300 mb-3">
+                                <svg xmlns="http://www.w3.org/2000/svg" class="h-6 w-6" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                                    <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M11 5H6a2 2 0 00-2 2v11a2 2 0 002 2h11a2 2 0 002-2v-5m-1.414-9.414a2 2 0 112.828 2.828L11.828 15H9v-2.828l8.586-8.586z" />
+                                </svg>
+                            </div>`;
+                    content = `<h3 class="font-medium text-gray-800 dark:text-white">${item.name}</h3>
+                              <p class="text-sm text-gray-500 dark:text-gray-400 mt-1">${item.content.substring(0, 50)}...</p>`;
+                } else if (item.type === 'link') {
+                    icon = `<div class="w-10 h-10 rounded-lg bg-blue-100 dark:bg-blue-900 flex items-center justify-center text-blue-600 dark:text-blue-300 mb-3">
+                                <svg xmlns="http://www.w3.org/2000/svg" class="h-6 w-6" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                                    <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M13.828 10.172a4 4 0 00-5.656 0l-4 4a4 4 0 105.656 5.656l1.102-1.101m-.758-4.899a4 4 0 005.656 0l4-4a4 4 0 00-5.656-5.656l-1.1 1.1" />
+                                </svg>
+                            </div>`;
+                    content = `<h3 class="font-medium text-gray-800 dark:text-white">${item.name}</h3>
+                              <p class="text-sm text-gray-500 dark:text-gray-400 mt-1">${item.description || 'No description'}</p>
+                              <p class="text-xs text-blue-500 dark:text-blue-400 mt-2 truncate">${item.url}</p>`;
+                }
+                
+                itemElement.innerHTML = `
+                    ${icon}
+                    ${content}
+                    <div class="flex justify-end mt-3">
+                        <button class="view-item-btn text-xs text-indigo-600 dark:text-indigo-400 hover:text-indigo-800 dark:hover:text-indigo-300">
+                            View Details
+                        </button>
+                    </div>
+                `;
+                
+                vaultSection.appendChild(itemElement);
+            });
+            
+            // Add event listeners to view buttons
+            document.querySelectorAll('.view-item-btn').forEach(btn => {
+                btn.addEventListener('click', function() {
+                    const itemId = parseInt(this.closest('.vault-item').dataset.id);
+                    viewItem(itemId);
+                });
+            });
+        }
+
+        function viewItem(itemId) {
+            const item = currentUser.vaultItems.find(i => i.id === itemId);
+            if (!item) return;
+            
+            itemModalTitle.textContent = item.name;
+            let content = '';
+            
+            if (item.type === 'credential') {
+                content = `
+                    <div class="space-y-3">
+                        <div>
+                            <label class="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-1">Username</label>
+                            <div class="flex items-center bg-gray-100 dark:bg-slate-700 p-2 rounded">
+                                <span>${item.username}</span>
+                                <button class="copy-btn ml-auto" data-value="${item.username}">
+                                    <svg xmlns="http://www.w3.org/2000/svg" class="h-5 w-5 text-indigo-600 dark:text-indigo-400" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                                        <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 5H7a2 2 0 00-2 2v12a2 2 0 002 2h10a2 2 0 002-2V7a2 2 0 00-2-2h-2M9 5a2 2 0 002 2h2a2 2 0 002-2M9 5a2 2 0 012-2h2a2 2 0 012 2" />
+                                    </svg>
+                                </button>
+                            </div>
+                        </div>
+                        <div>
+                            <label class="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-1">Password</label>
+                            <div class="flex items-center bg-gray-100 dark:bg-slate-700 p-2 rounded">
+                                <span>${item.password}</span>
+                                <button class="copy-btn ml-auto" data-value="${item.password}">
+                                    <svg xmlns="http://www.w3.org/2000/svg" class="h-5 w-5 text-indigo-600 dark:text-indigo-400" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                                        <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 5H7a2 2 0 00-2 2v12a2 2 0 002 2h10a2 2 0 002-2V7a2 2 0 00-2-2h-2M9 5a2 2 0 002 2h2a2 2 0 002-2M9 5a2 2 0 012-2h2a2 2 0 012 2" />
+                                    </svg>
+                                </button>
+                            </div>
+                        </div>
+                        <div>
+                            <label class="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-1">Website URL</label>
+                            <div class="flex items-center bg-gray-100 dark:bg-slate-700 p-2 rounded">
+                                <a href="${item.url}" target="_blank" class="text-indigo-600 dark:text-indigo-400 hover:underline">${item.url}</a>
+                                <button class="copy-btn ml-auto" data-value="${item.url}">
+                                    <svg xmlns="http://www.w3.org/2000/svg" class="h-5 w-5 text-indigo-600 dark:text-indigo-400" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                                        <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 5H7a2 2 0 00-2 2v12a2 2 0 002 2h10a2 2 0 002-2V7a2 2 0 00-2-2h-2M9 5a2 2 0 002 2h2a2 2 0 002-2M9 5a2 2 0 012-2h2a2 2 0 012 2" />
+                                    </svg>
+                                </button>
+                            </div>
+                        </div>
+                    </div>
+                `;
+            } else if (item.type === 'document') {
+                content = `
+                    <div class="space-y-3">
+                        <div>
+                            <label class="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-1">File Name</label>
+                            <div class="flex items-center bg-gray-100 dark:bg-slate-700 p-2 rounded">
+                                <span>${item.file}</span>
+                                <button class="download-btn ml-auto">
+                                    <svg xmlns="http://www.w3.org/2000/svg" class="h-5 w-5 text-purple-600 dark:text-purple-400" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                                        <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M4 16v1a3 3 0 003 3h10a3 3 0 003-3v-1m-4-4l-4 4m0 0l-4-4m4 4V4" />
+                                    </svg>
+                                </button>
+                            </div>
+                        </div>
+                        <div>
+                            <label class="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-1">Description</label>
+                            <div class="bg-gray-100 dark:bg-slate-700 p-2 rounded">
+                                <p>${item.description}</p>
+                            </div>
+                        </div>
+                        <div>
+                            <label class="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-1">Upload Date</label>
+                            <div class="bg-gray-100 dark:bg-slate-700 p-2 rounded">
+                                <p>${new Date().toLocaleDateString()}</p>
+                            </div>
+                        </div>
+                    </div>
+                `;
+            } else if (item.type === 'note') {
+                content = `
+                    <div class="bg-gray-100 dark:bg-slate-700 p-4 rounded">
+                        <p class="whitespace-pre-line">${item.content}</p>
+                    </div>
+                    <div class="mt-4 text-sm text-gray-500 dark:text-gray-400">
+                        Last updated: ${new Date().toLocaleDateString()}
+                    </div>
+                `;
+            } else if (item.type === 'link') {
+                content = `
+                    <div class="space-y-3">
+                        <div>
+                            <label class="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-1">URL</label>
+                            <div class="flex items-center bg-gray-100 dark:bg-slate-700 p-2 rounded">
+                                <a href="${item.url}" target="_blank" class="text-blue-600 dark:text-blue-400 hover:underline">${item.url}</a>
+                                <button class="copy-btn ml-auto" data-value="${item.url}">
+                                    <svg xmlns="http://www.w3.org/2000/svg" class="h-5 w-5 text-blue-600 dark:text-blue-400" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                                        <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 5H7a2 2 0 00-2 2v12a2 2 0 002 2h10a2 2 0 002-2V7a2 2 0 00-2-2h-2M9 5a2 2 0 002 2h2a2 2 0 002-2M9 5a2 2 0 012-2h2a2 2 0 012 2" />
+                                    </svg>
+                                </button>
+                            </div>
+                        </div>
+                        <div>
+                            <label class="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-1">Description</label>
+                            <div class="bg-gray-100 dark:bg-slate-700 p-2 rounded">
+                                <p>${item.description || 'No description provided'}</p>
+                            </div>
+                        </div>
+                    </div>
+                `;
+            }
+            
+            itemModalContent.innerHTML = content;
+            
+            // Add event listeners to copy buttons
+            document.querySelectorAll('.copy-btn').forEach(btn => {
+                btn.addEventListener('click', function() {
+                    const value = this.dataset.value;
+                    navigator.clipboard.writeText(value);
+                    showNotification('Copied to clipboard');
+                });
+            });
+            
+            // Set delete button data-id
+            deleteItemBtn.dataset.id = itemId;
+            
+            viewItemModal.classList.remove('hidden');
+        }
+
+        function deleteItem() {
+            const itemId = parseInt(this.dataset.id);
+            currentUser.vaultItems = currentUser.vaultItems.filter(item => item.id !== itemId);
+            
+            renderVaultItems();
+            viewItemModal.classList.add('hidden');
+            
+            showNotification('Item deleted successfully');
+        }
+
+        function renderTickets() {
+            ticketList.innerHTML = '';
+            
+            currentUser.tickets.forEach(ticket => {
+                const ticketElement = document.createElement('div');
+                ticketElement.className = 'bg-white dark:bg-slate-800 rounded-lg shadow p-4 vault-item';
+                
+                let statusClass = '';
+                if (ticket.status === 'resolved') statusClass = 'bg-green-100 dark:bg-green-900 text-green-800 dark:text-green-200';
+                else if (ticket.status === 'processing') statusClass = 'bg-yellow-100 dark:bg-yellow-900 text-yellow-800 dark:text-yellow-200';
+                else statusClass = 'bg-blue-100 dark:bg-blue-900 text-blue-800 dark:text-blue-200';
+                
+                ticketElement.innerHTML = `
+                    <div class="flex justify-between items-start">
+                        <h3 class="font-medium text-gray-800 dark:text-white">${ticket.subject}</h3>
+                        <span class="text-xs px-2 py-1 rounded-full ${statusClass}">${ticket.status.charAt(0).toUpperCase() + ticket.status.slice(1)}</span>
+                    </div>
+                    <p class="text-sm text-gray-600 dark:text-gray-300 mt-2">${ticket.description}</p>
+                    <div class="flex justify-between items-center mt-4">
+                        <span class="text-xs text-gray-500 dark:text-gray-400">${ticket.date}</span>
+                        <button class="text-xs text-indigo-600 dark:text-indigo-400 hover:text-indigo-800 dark:hover:text-indigo-300" data-id="${ticket.id}">
+                            View Details
+                        </button>
+                    </div>
+                `;
+                
+                ticketList.appendChild(ticketElement);
+            });
+        }
+
+        function submitTicket(e) {
+            e.preventDefault();
+            
+            const newTicket = {
+                id: Date.now(),
+                subject: ticketSubject.value,
+                description: ticketDescription.value,
+                status: 'open',
+                date: new Date().toLocaleDateString()
+            };
+            
+            currentUser.tickets.push(newTicket);
+            renderTickets();
+            ticketForm.reset();
+            
+            showNotification('Ticket submitted successfully');
+        }
+
+        function showNotification(message) {
+            const notification = document.createElement('div');
+            notification.className = 'fixed bottom-5 left-1/2 transform -translate-x-1/2 bg-gray-800 text-white px-4 py-2 rounded-lg shadow-lg flex items-center dark:bg-gray-700';
+            notification.innerHTML = `
+                <svg xmlns="http://www.w3.org/2000/svg" class="h-5 w-5 mr-2 text-green-400" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                    <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 12l2 2 4-4m6 2a9 9 0 11-18 0 9 9 0 0118 0z" />
+                </svg>
+                <span>${message}</span>
+            `;
+            
+            document.body.appendChild(notification);
+            
+            setTimeout(() => {
+                notification.classList.add('opacity-0', 'transition-opacity', 'duration-300');
+                setTimeout(() => notification.remove(), 300);
+            }, 3000);
+        }
+
+        // Initialize theme from localStorage
+        if (localStorage.getItem('theme') === 'dark') {
+            document.documentElement.classList.add('dark');
+            sunIcon.classList.add('hidden');
+            moonIcon.classList.remove('hidden');
+        } else {
+            document.documentElement.classList.remove('dark');
+            moonIcon.classList.add('hidden');
+            sunIcon.classList.remove('hidden');
+        }
+
+        // Disable biometric button initially
+        biometricAuthBtn.disabled = true;
+        biometricAuthBtn.classList.add('opacity-50');
+
+        // Tab switching for authentication methods
+        const biometricTab = document.getElementById('biometric-tab');
+        const passwordTab = document.getElementById('password-tab');
+        const biometricLoginSection = document.getElementById('biometric-login-section');
+        const passwordLoginSection = document.getElementById('password-login-section');
+
+        biometricTab.addEventListener('click', () => {
+            biometricTab.classList.add('bg-indigo-600', 'text-white');
+            passwordTab.classList.remove('bg-indigo-600', 'text-white');
+            biometricLoginSection.classList.remove('hidden');
+            passwordLoginSection.classList.add('hidden');
+        });
+
+        passwordTab.addEventListener('click', () => {
+            passwordTab.classList.add('bg-indigo-600', 'text-white');
+            biometricTab.classList.remove('bg-indigo-600', 'text-white');
+            passwordLoginSection.classList.remove('hidden');
+            biometricLoginSection.classList.add('hidden');
+        });
+
+        // Password login form submission
+        document.getElementById('password-login-section').addEventListener('submit', function(e) {
+            e.preventDefault();
+            
+            const username = document.getElementById('password-user').value;
+            const password = document.getElementById('user-password').value;
+            
+            // Correct password authentication
+            const user = users[username];
+            if (user && user.password === password) {
+                currentUser = user;
+                userName.textContent = currentUser.name;
+                userDept.textContent = currentUser.dept;
+                userAvatar.src = currentUser.avatar;
+                userAvatar.alt = `Profile photo of ${currentUser.name}`;
+                welcomeMessage.textContent = currentUser.welcomeMessage;
+                authModal.classList.add('hidden');
+                appContent.classList.remove('hidden');
+                renderVaultItems();
+                renderTickets();
+                renderAccountInfo();
+                showNotification(`Welcome, ${currentUser.name}!`);
+                document.getElementById('password-login-error').classList.add('hidden');
+                this.reset();
+            } else {
+                document.getElementById('password-login-error').textContent = "Incorrect username or password.";
+                document.getElementById('password-login-error').classList.remove('hidden');
+            }
+        });
+
+// Chatbot functionality
+const chatbotWindow = document.getElementById('chatbot-window');
+const chatbotForm = document.getElementById('chatbot-form');
+const chatbotInput = document.getElementById('chatbot-input');
+const chatbotQuestionsContainer = document.getElementById('chatbot-questions-container');
+const chatbotCategoryButtons = document.querySelectorAll('.chatbot-category-btn');
+
+// Chatbot Q&A data
+const chatbotData = {
+    IT: {
+        "I forgot my system login password. What should I do?": "Please click on \"Forgot Password\" on the login page or contact IT support through the help desk for password reset verification.",
+        "The internet is down in my department. How do I report this?": "Select \"Network Issues\" under the \"Report a Problem\" tab. Our IT team will be notified immediately.",
+        "How do I connect to the company VPN remotely?": "Use the VPN client provided by IT. You'll need your employee credentials and 2FA token. If you haven't received it, please contact support.",
+        "My fingerprint scanner is not working. What should I do?": "Clean the sensor and try again. If the issue persists, request a maintenance check via the Biometric section in the help desk.",
+        "How can I access my company email?": "Visit mail.companydomain.com, enter your credentials, and use the MFA code sent to your phone."
+    },
+    Safety: {
+        "What should I do if there's a gas leak at the site?": "Evacuate immediately and report to the emergency assembly point. Notify the safety officer via the Emergency tab.",
+        "How do I report a safety hazard in the field?": "Go to \"Report an Incident\" and fill in the hazard details with optional photo upload.",
+        "Where can I find the latest safety protocols?": "Navigate to the \"Documents\" section in your dashboard. Select \"Safety Manual - Latest Version\".",
+        "Who is the current Health and Safety Officer on duty?": "The on-duty officer for today is Mr. Kwame Boateng. You can contact him directly at extension 204.",
+        "What PPE is mandatory for the underground zone?": "Helmet, respirator, protective boots, gloves, and visibility vest are all mandatory in Zone C."
+    },
+    Equipment: {
+        "My excavator won't start. Who do I call?": "Submit a ticket under \"Equipment Malfunction > Excavator\" or call the mechanic team at ext. 311.",
+        "How do I schedule routine maintenance for a truck?": "Use the Maintenance Scheduler tool under \"Fleet Services\" to book a slot.",
+        "Can I get a spare helmet or PPE?": "Yes. Submit a request under \"Supply Request > Safety Equipment.\"",
+        "What is the inspection date for Drill Machine #14?": "Drill Machine #14 is due for inspection on August 10th, 2025."
+    },
+    HR: {
+        "How do I update my emergency contact details?": "Visit \"Profile Settings\" and select \"Emergency Contact\" to edit your info.",
+        "Where can I view my leave balance?": "Go to the HR portal > Leave Section > My Leave Balance.",
+        "I need a payslip for June. How do I get it?": "You can download it from \"Payroll > Payslip History > June 2025\".",
+        "How do I request for time off?": "Submit a leave request in the HR portal under \"Request Leave\"."
+    },
+    General: {
+        "Where is the current location of Delivery Truck #03?": "Truck #03 is currently at Site B, unloading raw materials.",
+        "Can I get a replacement ID card?": "Yes, submit a request through \"Admin Services > ID Replacement\".",
+        "When is the next staff safety training?": "The next training is scheduled for August 12th at 10 AM in Training Room A.",
+        "How do I speak to a real person?": "Type \"human\" or click the \"Contact Live Agent\" button to be connected with our support team.",
+        "What's the working hours for the help desk?": "The help desk is available from 7 AM to 7 PM, Monday to Saturday.",
+        "Can I access the help desk outside working hours?": "Yes, the chatbot is available 24/7. Human responses will resume during working hours.",
+        "Is this chat recorded?": "Yes, for quality assurance and audit purposes, all chats are securely logged."
+    }
+};
+
+// Initialize chatbot with welcome message
+function initChatbot() {
+    addChatMessage('bot', 'Hello! I\'m your Help Desk Assistant. Select a category below or type your question, and I\'ll do my best to help.');
+}
+
+// Render a chat message
+function addChatMessage(sender, text) {
+    const msgDiv = document.createElement('div');
+    msgDiv.className = sender === 'user'
+        ? 'self-end bg-indigo-100 dark:bg-indigo-900 text-indigo-800 dark:text-indigo-200 px-3 py-2 rounded-lg max-w-xs'
+        : 'self-start bg-gray-100 dark:bg-gray-700 text-gray-800 dark:text-gray-200 px-3 py-2 rounded-lg max-w-xs';
+    msgDiv.textContent = text;
+    chatbotWindow.appendChild(msgDiv);
+    chatbotWindow.scrollTop = chatbotWindow.scrollHeight;
+}
+
+// Get bot response based on user message
+function getBotResponse(message) {
+    const msg = message.toLowerCase().trim();
+    
+    // Check for exact matches first
+    for (const category in chatbotData) {
+        for (const question in chatbotData[category]) {
+            if (question.toLowerCase() === msg || question.toLowerCase().includes(msg)) {
+                return chatbotData[category][question];
+            }
+        }
+    }
+    
+    // Check for partial matches
+    for (const category in chatbotData) {
+        for (const question in chatbotData[category]) {
+            if (question.toLowerCase().includes(msg)) {
+                return chatbotData[category][question];
+            }
+        }
+    }
+    
+    // Default responses for common queries
+    if (msg.includes('hello') || msg.includes('hi')) {
+        return "Hello! How can I assist you today? You can select a category below or ask me a specific question.";
+    }
+    if (msg.includes('thank')) {
+        return "You're welcome! If you have more questions, just ask.";
+    }
+    
+    return "I'm sorry, I don't have information on that specific topic. Please select a category below or rephrase your question. For urgent issues, please submit a ticket.";
+}
+
+// Render questions for a specific category
+function renderQuestions(category) {
+    chatbotQuestionsContainer.innerHTML = '';
+    const questions = chatbotData[category];
+    
+    for (const question in questions) {
+        const questionBtn = document.createElement('button');
+        questionBtn.className = 'chatbot-question-btn text-left w-full p-3 mb-2 bg-white dark:bg-slate-700 rounded-lg shadow-sm hover:shadow-md transition-shadow text-sm';
+        questionBtn.textContent = question;
+        questionBtn.dataset.category = category;
+        chatbotQuestionsContainer.appendChild(questionBtn);
+    }
+    
+    // Add event listeners to question buttons
+    document.querySelectorAll('.chatbot-question-btn').forEach(btn => {
+        btn.addEventListener('click', function() {
+            const question = this.textContent;
+            const category = this.dataset.category;
+            const answer = chatbotData[category][question];
+            
+            // Add user question to chat
+            addChatMessage('user', question);
+            
+            // Add bot response to chat
+            setTimeout(() => {
+                addChatMessage('bot', answer);
+                // Scroll to bottom to show new messages
+                chatbotWindow.scrollTop = chatbotWindow.scrollHeight;
+            }, 300);
+        });
+    });
+}
+
+// Set up category button event listeners
+chatbotCategoryButtons.forEach(btn => {
+    btn.addEventListener('click', function() {
+        const category = this.dataset.category;
+        renderQuestions(category);
+        
+        // Update active button styling
+        chatbotCategoryButtons.forEach(b => {
+            b.classList.remove('ring-2', 'ring-indigo-500');
+        });
+        this.classList.add('ring-2', 'ring-indigo-500');
+    });
+});
+
+// Handle chatbot form submit
+chatbotForm.addEventListener('submit', function(e) {
+    e.preventDefault();
+    const userMsg = chatbotInput.value.trim();
+    if (!userMsg) return;
+    addChatMessage('user', userMsg);
+    chatbotInput.value = '';
+    setTimeout(() => {
+        const botReply = getBotResponse(userMsg);
+        addChatMessage('bot', botReply);
+    }, 500);
+});
+
+        // Initialize chatbot on page load
+        initChatbot();
+        
+        // Admin panel event listeners
+        document.getElementById('admin-refresh-btn').addEventListener('click', function() {
+            renderAdminTickets();
+            showNotification('Admin dashboard refreshed');
+        });
+        
+        document.getElementById('admin-ticket-search').addEventListener('input', function() {
+            const searchTerm = this.value;
+            const statusFilter = document.getElementById('admin-status-filter').value;
+            const priorityFilter = document.getElementById('admin-priority-filter').value;
+            renderAdminTickets(statusFilter, priorityFilter, searchTerm);
+        });
+        
+        document.getElementById('admin-status-filter').addEventListener('change', function() {
+            const statusFilter = this.value;
+            const priorityFilter = document.getElementById('admin-priority-filter').value;
+            const searchTerm = document.getElementById('admin-ticket-search').value;
+            renderAdminTickets(statusFilter, priorityFilter, searchTerm);
+        });
+        
+        document.getElementById('admin-priority-filter').addEventListener('change', function() {
+            const priorityFilter = this.value;
+            const statusFilter = document.getElementById('admin-status-filter').value;
+            const searchTerm = document.getElementById('admin-ticket-search').value;
+            renderAdminTickets(statusFilter, priorityFilter, searchTerm);
+        });
+    </script>
+</body>
+</html>

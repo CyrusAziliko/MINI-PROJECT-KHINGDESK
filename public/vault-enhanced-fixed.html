@@ -1,0 +1,253 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1" />
+    <title>User Vault - VaultDesk</title>
+    <link rel="stylesheet" href="enhanced-styles.css" />
+    <link rel="stylesheet" href="animations-enhanced.css" />
+    <style>
+        body {
+            font-family: 'Inter', sans-serif;
+            background: url('background mine.jpg') center center/cover no-repeat, linear-gradient(135deg, #f8fafc, #e2e8f0);
+            min-height: 100vh;
+            overflow-x: hidden;
+            padding: 2rem;
+        }
+        .dark body {
+            background: url('background mine.jpg') center center/cover no-repeat, linear-gradient(135deg, #0f172a, #1e293b);
+        }
+        .vault-container {
+            max-width: 900px;
+            margin: 0 auto;
+            background: rgba(255, 255, 255, 0.1);
+            backdrop-filter: blur(10px);
+            border-radius: 20px;
+            padding: 2rem;
+            box-shadow: 0 8px 32px rgba(0,0,0,0.1);
+        }
+        .upload-area {
+            border: 2px dashed #667eea;
+            border-radius: 15px;
+            padding: 3rem;
+            text-align: center;
+            cursor: pointer;
+            transition: all 0.3s ease;
+            position: relative;
+            overflow: hidden;
+        }
+        .upload-area.dragover {
+            border-color: #4ade80;
+            background: rgba(74, 222, 128, 0.1);
+            transform: scale(1.02);
+        }
+        .folder-icon {
+            font-size: 5rem;
+            color: #667eea;
+            animation: folderSwallow 1s ease forwards;
+            position: relative;
+            z-index: 1;
+        }
+        @keyframes folderSwallow {
+            0% { transform: scale(1) translateY(0); }
+            100% { transform: scale(1.2) translateY(10px); }
+        }
+        .file-list {
+            margin-top: 2rem;
+            max-height: 300px;
+            overflow-y: auto;
+        }
+        .file-item {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            background: rgba(255,255,255,0.15);
+            border-radius: 10px;
+            padding: 0.5rem 1rem;
+            margin-bottom: 0.5rem;
+            cursor: pointer;
+            transition: background 0.3s ease;
+        }
+        .file-item:hover {
+            background: rgba(255,255,255,0.3);
+        }
+        .tag {
+            background: #8b5cf6;
+            color: white;
+            border-radius: 12px;
+            padding: 0.2rem 0.6rem;
+            font-size: 0.75rem;
+            margin-left: 0.5rem;
+        }
+        .search-bar {
+            margin-bottom: 1rem;
+            width: 100%;
+            padding: 0.5rem 1rem;
+            border-radius: 12px;
+            border: none;
+            box-shadow: 0 0 10px rgba(102, 126, 234, 0.5);
+            font-size: 1rem;
+        }
+        .activity-log {
+            margin-top: 2rem;
+            max-height: 200px;
+            overflow-y: auto;
+            border-top: 1px solid rgba(255,255,255,0.2);
+            padding-top: 1rem;
+        }
+        .activity-item {
+            font-size: 0.9rem;
+            color: #4b5563;
+            margin-bottom: 0.5rem;
+            animation: fadeSlideUp 0.5s ease forwards;
+        }
+        @keyframes fadeSlideUp {
+            from {
+                opacity: 0;
+                transform: translateY(10px);
+            }
+            to {
+                opacity: 1;
+                transform: translateY(0);
+            }
+        }
+        .file-preview-modal {
+            position: fixed;
+            top: 50%;
+            left: 50%;
+            transform: translate(-50%, -50%) scale(0);
+            background: rgba(0,0,0,0.8);
+            backdrop-filter: blur(10px);
+            border-radius: 20px;
+            padding: 1rem;
+            max-width: 80%;
+            max-height: 80%;
+            overflow: auto;
+            transition: transform 0.3s ease;
+            z-index: 1000;
+        }
+        .file-preview-modal.active {
+            transform: translate(-50%, -50%) scale(1);
+        }
+        .file-preview-content {
+            color: white;
+        }
+        .close-btn {
+            position: absolute;
+            top: 10px;
+            right: 15px;
+            background: transparent;
+            border: none;
+            color: white;
+            font-size: 1.5rem;
+            cursor: pointer;
+        }
+    </style>
+</head>
+<body>
+    <div class="vault-container">
+        <h1 class="text-3xl font-bold mb-4 text-gray-800 dark:text-white">User Vault</h1>
+        <input type="text" id="searchInput" class="search-bar" placeholder="Search files or tags..." />
+        <div class="upload-area" id="uploadArea">
+            <div class="folder-icon">📁</div>
+            <p>Drag & drop files here or click to upload</p>
+        </div>
+        <div class="file-list" id="fileList"></div>
+        <div class="activity-log" id="activityLog"></div>
+    </div>
+
+    <div class="file-preview-modal" id="filePreviewModal">
+        <button class="close-btn" onclick="closePreview()">×</button>
+        <div class="file-preview-content" id="filePreviewContent"></div>
+    </div>
+
+    <script>
+        const uploadArea = document.getElementById('uploadArea');
+        const fileList = document.getElementById('fileList');
+        const activityLog = document.getElementById('activityLog');
+        const searchInput = document.getElementById('searchInput');
+        const filePreviewModal = document.getElementById('filePreviewModal');
+        const filePreviewContent = document.getElementById('filePreviewContent');
+
+        let files = [];
+        let activityItems = [];
+
+        uploadArea.addEventListener('dragover', (e) => {
+            e.preventDefault();
+            uploadArea.classList.add('dragover');
+        });
+
+        uploadArea.addEventListener('dragleave', () => {
+            uploadArea.classList.remove('dragover');
+        });
+
+        uploadArea.addEventListener('drop', (e) => {
+            e.preventDefault();
+            uploadArea.classList.remove('dragover');
+            handleFiles(e.dataTransfer.files);
+        });
+
+        uploadArea.addEventListener('click', () => {
+            const input = document.createElement('input');
+            input.type = 'file';
+            input.multiple = true;
+            input.onchange = (e) => handleFiles(e.target.files);
+            input.click();
+        });
+
+        function handleFiles(selectedFiles) {
+            Array.from(selectedFiles).forEach(file => {
+                files.push({
+                    name: file.name,
+                    type: file.type,
+                    tags: [],
+                    content: null
+                });
+                addActivity(`Uploaded file: ${file.name}`);
+            });
+            renderFileList();
+        }
+
+        function renderFileList() {
+            fileList.innerHTML = '';
+            const searchTerm = searchInput.value.toLowerCase();
+            files.filter(file => {
+                return file.name.toLowerCase().includes(searchTerm) || file.tags.some(tag => tag.toLowerCase().includes(searchTerm));
+            }).forEach((file, index) => {
+                const fileItem = document.createElement('div');
+                fileItem.className = 'file-item';
+                fileItem.textContent = file.name;
+                fileItem.onclick = () => previewFile(index);
+                fileList.appendChild(fileItem);
+            });
+        }
+
+        function addActivity(text) {
+            const item = document.createElement('div');
+            item.className = 'activity-item';
+            item.textContent = text;
+            activityLog.prepend(item);
+            activityItems.push(item);
+            if (activityItems.length > 10) {
+                const last = activityItems.pop();
+                last.remove();
+            }
+        }
+
+        function previewFile(index) {
+            const file = files[index];
+            filePreviewContent.textContent = `Preview of ${file.name} (content preview not implemented)`;
+            filePreviewModal.classList.add('active');
+            addActivity(`Previewed file: ${file.name}`);
+        }
+
+        function closePreview() {
+            filePreviewModal.classList.remove('active');
+        }
+
+        searchInput.addEventListener('input', renderFileList);
+
+        renderFileList();
+    </script>
+</body>
+</html>

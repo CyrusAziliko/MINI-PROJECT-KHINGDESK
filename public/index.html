@@ -1,0 +1,70 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>VaultDesk: Biometric-Secured Worker Support Portal</title>
+    <script src="https://cdn.tailwindcss.com"></script>
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700&display=swap" rel="stylesheet">
+    <link rel="stylesheet" href="enhanced-styles.css">
+    <style>
+        /* Additional custom styles */
+        body {
+            font-family: 'Inter', sans-serif;
+            background: url('background mine.jpg') center center/cover no-repeat, linear-gradient(135deg, #f8fafc, #e2e8f0);
+            min-height: 100vh;
+            overflow-x: hidden;
+        }
+        
+        .dark body {
+            background: url('background mine.jpg') center center/cover no-repeat, linear-gradient(135deg, #0f172a, #1e293b);
+        }
+        
+        /* Custom scrollbar for webkit browsers */
+        ::-webkit-scrollbar {
+            width: 12px;
+        }
+
+        ::-webkit-scrollbar-track {
+            background: rgba(241, 245, 249, 0.5);
+        }
+
+        .dark ::-webkit-scrollbar-track {
+            background: rgba(15, 23, 42, 0.5);
+        }
+
+        ::-webkit-scrollbar-thumb {
+            background: linear-gradient(180deg, #6366f1, #8b5cf6);
+            border-radius: 6px;
+        }
+
+        ::-webkit-scrollbar-thumb:hover {
+            background: linear-gradient(180deg, #4f46e5, #7c3aed);
+        }
+    </style>
+</head>
+<body class="bg-slate-50 dark:bg-slate-900 transition-colors duration-300">
+    <div class="fixed inset-0 flex items-center justify-center">
+        <div class="text-center">
+            <div class="w-16 h-16 rounded-full bg-gradient-to-r from-indigo-500 to-purple-600 flex items-center justify-center mx-auto mb-4 neon-effect">
+                <svg xmlns="http://www.w3.org/2000/svg" class="h-8 w-8 text-white" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                    <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 15v2m-6 4h12a2 2 0 002-2v-6a2 2 0 00-2-2H6a2 2 0 00-2 2v6a2 2 0 002 2zm10-10V7a4 4 0 00-8 0v4h8z" />
+                </svg>
+            </div>
+            <h1 class="text-3xl font-bold text-gray-800 dark:text-white mb-2">VaultDesk</h1>
+            <p class="text-gray-600 dark:text-gray-300 mb-6">Biometric-Secured Worker Support Portal</p>
+            <div class="flex justify-center mb-4">
+                <div class="w-12 h-12 border-t-2 border-blue-500 border-solid rounded-full animate-spin"></div>
+            </div>
+            <p class="text-gray-500 dark:text-gray-400">Loading application...</p>
+        </div>
+    </div>
+
+    <script>
+        // Redirect to the main application page
+        setTimeout(() => {
+            window.location.href = '/Page.html';
+        }, 1000);
+    </script>
+</body>
+</html>
